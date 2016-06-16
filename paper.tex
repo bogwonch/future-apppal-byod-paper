@@ -1,0 +1,299 @@
+\documentclass[a4paper]{article}
+
+\usepackage{microtype}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{acronym}
+\acrodef{MDM}{mobile device management}
+\acrodef{BYOD}{bring your own device}
+
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
+% AppPAL and Listing formatting
+\usepackage{listings}
+\lstdefinelanguage{AppPAL}{%
+  morekeywords={if,inf,says,where,true,false},
+  otherkeywords={can-act-as,can-say},
+  sensitive=true,
+  morestring=[b]',
+  literate={\ inf\ }{{$\infty$}}5
+}[keywords,strings]
+\lstset{%
+  basicstyle=\ttfamily\footnotesize{},
+  stringstyle=\sffamily\footnotesize{},
+  keywordstyle=\ttfamily\slshape\footnotesize{},
+  language=AppPAL,
+  columns=flexible,
+  frame=single,
+  framesep=0.5pt,
+  framexleftmargin=2.5pt,
+  framexrightmargin=2.5pt,
+}
+
+\newcommand{\dotdotdot}[1]{#1}
+
+\title{Case Study Formalising Mobile BYOD Policies with AppPAL}
+\author{Joseph Hallett and David Aspinall}
+\begin{document}
+\maketitle
+
+% 4 sentences
+\begin{abstract}
+  \begin{itemize}
+  \item BYOD policies written infromally, with no real means to enforce.
+  \item Created standard language by analyzing \emph{X} real policies, using AppPAL
+  \item Using formal methods we found \emph{Y} problems.
+  \item AppPAL is a helpful language for thinking about policies in. 
+  \end{itemize}
+\end{abstract}
+
+% 1 page
+\section{Introduction}
+\label{sec:intro}
+% 1. Describe the problem
+% 2. State your contributions
+% ...and that is all
+
+Employees bring their personal devices to work.
+This creates a problem for corporate IT departments:
+  they want to secure their company's networks, but they have limited control over the personal devices running on them.
+To ensure compliance IT departments pubilsh mobile device polices.
+A recent survey found that around 70\% of companies published some form of mobile device policy~\cite{schulze_byod_2016}.
+Employees must agree to follow these policies if they want to use their personal devices at work.
+
+Often the policies are specified with natural language.
+This makes compliance hard as the policies can contain ambiguities, contradictions and can change without the user's noticing there is a new policy to follow.
+To solve this some companies offer \ac{MDM} software that can help enforce some of the policies, however their capabilities are usually limited to banning specific apps and configuring email and filesharing services.
+Even when companies have \ac{MDM} software a survey found that over 50\% of companies have one or more devices on their network that did not comply with their policies~\cite{mobileiron_security_labs_q4_2015}.
+
+Formal languages can help to remove ambiguities in policies and identify when policies contain problems.
+We show how the AppPAL language~\cite{hallett_apppal_2016} can be used to formalise \ac{BYOD} policies, and present a standard set of predicates and idioms from translating real \ac{BYOD} policies from the SANS institute and NHS.
+By translating these policies into formal language we were able to identify cases where the policy rule were duplicated, and underspecified.
+
+In this paper we present excerpts from the AppPAL translations of two BYOD policies.
+In particular we focus on the translations of a policy from an NHS Trust hospital, and from an exemplar policy from the SANS institute designed to help companies devise their own policies.  These policies are more complex than a typical BYOD policies as they have rules which go beyond white and black listing.  We illustrate how AppPAL's checking methods can identify when the policies are under-specified and when the policies contain redundency, either through policies being duplicated in the documents or by policies with simplified rules in the same document.
+
+% 1 page
+\section{The Problem}
+\label{sec:problem}
+
+Consider a policy for describing what apps can be installed on a mobile device for use at work.
+One approach might be to provide a list of authorized and unauthorized apps.
+Employees should cosult this list before running any apps, and any \ac{MDM} software ought to enforce the list automatically.
+Both the SANS and NHS policies give requirements implementing these policies.
+In the SANS policy the IT department is responsible for maintaining the lists, and in the NHS policy (which only uses whitelisting) an app is only approved if the Care and Clinical Policy group approves it as well as another group depending on whether it is a clinical or non-clinical app.
+
+\begin{lstlisting}[title={\footnotesize\textbf{SANS}:~\itshape 
+``The IT Department maintains a list of allowed and unauthorised applications and makes them available to users on the intranet.''}]
+'sans-policy' says 'it-department' can-say App isInstallable.
+\end{lstlisting}
+\begin{lstlisting}[title={\footnotesize\textbf{NHS}:~\itshape ``%
+Apps for work usage must not be downloaded onto corporately issued mobile devices (even if approved on the NHS apps store) unless they have been approved through the following Trust channels: 
+    Clinical apps;
+        at the time of writing there are no apps clinically approved by the Trust for use with patients/clients. 
+        However, if a member of staff believes that there are clinical apps \dotdotdot{or other technologies that could benefit their patients/clients, this should be discussed with the clinical lead in the first instance and} ratification should be sought via the Care and Clinical Policies Group. 
+        \dotdotdot{A clinical app should not be used if it has not been approved via this group.}
+    Business apps; 
+        at the time of writing there are no business (i.e., non-clinical) apps approved by the Trust for use other than those preloaded onto the device at the point of issue. 
+        However, if a member of staff believes that there are apps \dotdotdot{or other technologies that could benefit their non-clinical work,} ratification of the app must be sought via the Management of Information Group (MIG). 
+        \dotdotdot{An app should not be used if it has not been approved via this group.}
+Following approval through Care and Clinical Policies and/or MIG, final approval will be required through Integrated Governance Committee.''}]
+'nhs-policy' says App isInstallable if App isUsable, App isFinallyApproved.
+'nhs-policy' says 'cacpg' can-say App isUsable if App isUsableClinically.
+'nhs-policy' says 'mig' can-say App isUsable if App isUsableNonClinically.
+'nhs-policy' says 'igc' can-say App isFinallyApproved.
+\end{lstlisting}
+
+In the case of the NHS requirement the entire requirement seems redundant as it states there no apps have been approved.
+What the rule gives us, and what is made explicit in the formalization is who would need to approve the app if we were going to get an approved one.
+As well as providing improvements to readability, the formalization in AppPAL makes explicit who has approved each app.
+It also helps us spot when a rule is duplicated, for instance the SANS policy later has a requirement that:
+
+\begin{lstlisting}[title={\footnotesize\textbf{SANS}:~\itshape 
+``Only approved third party applications can be
+installed on handhelds. The approved list can be
+obtained by contacting the IT department, or should be
+available on the intranet.''}]
+'sans-policy' says 'it-department' can-say App isInstallable.
+\end{lstlisting}
+
+When reading the natural language requirement it might not be immediately obvious that there is duplication, but with the formalization it is immediately apparent.  This suggests that the policy could be improved by removing, or combining the requirements to remove ambiguity and prevent problems later if the requirement was to be updated.
+
+% 2 pages
+\section{My Idea}
+\label{sec:idea}
+
+Writing policies in a formal language gives us two major benefits. 
+Firstly it gives us a precise framework for describing what each policy actually means and how it can be satisfied and allowing comparison between policies from different sources.  Secondly it allows the use of policy checking tools that can infer when a policy may have problems.
+
+Translating natural language policies into fromal language is not trivial, however.
+Care should be taken to preserve not only the meaning of the policy but also the spirit and style of the original policy.
+Not all policies are specified in the same manner however. 
+Both the SANS and NHS policies, for example, specify when it is appropriate to use the camera.
+The SANS policy tends toward being prohibitive, describing when features should be disabled.
+\begin{lstlisting}[title={\footnotesize\textbf{SANS}:~\itshape
+``Digital camera embedded on handheld devices might be
+disabled in restricted environments, according to Company risk analysis.}]
+'company' says Device mustDisable('camera') 
+  if 'restricted-environment' isWhereIs(Device).
+\end{lstlisting}
+The NHS policy is expressed differently describing when it is appropriate to use the camera.
+\begin{lstlisting}[title={\footnotesize\textbf{NHS}:~\itshape
+  ``Some mobile devices have the ability to take photographs~/~videos. This
+  function should not be used for photographs~/~videos of an individual's
+  care and treatment unless the device has encryption enabled and it is
+  clinically appropriate to do so.''}]
+'nhs-trust' says Device canPhotograph(Patient)
+  if Device isEncrypted, Patient canBePhotographed.
+\end{lstlisting}
+
+Both approaches can be expressed using AppPAL, and even if the two
+approaches were mixed into the same policy in this case it would not
+cause problems from an enforcement perspective: a photo could not be
+taken if the camera were disabled even if the the user had the
+authorization.  In general though this can lead to confilicts, which
+will need to be resolved.  When using AppPAL as a tool for comparison
+and thinking about policies the difference in approach makes
+comparison hard, especially when using automated tools.  It isn't
+obvious, at least to a machine, that disabling the camera will prevent
+photographs from being taken.
+
+To help resolve issues with specification we present a generalized schema of BYOD predicates that can be used when describing BYOD policies (\autoref{tab:predicates}).  They represent some of the most common decisions and entities making decisions we have found when looking at BYOD policies.
+AppPAL policies can use arbitrary predicates, but to help structure our policies we use standard prefixes.
+
+\begin{minipage}{\textwidth}
+  \footnotesize
+  \centering
+\newcommand{\PrefixT}[3]{\textit{#1}~\texttt{#2}\textit{#3}}
+\begin{tabular}{l l}
+  \toprule
+  Predicate & Meaning \\
+  \midrule
+  \PrefixT{Subject}{can}{Action} & The \emph{subject} is allowed to perform the \emph{action}. \\
+  \PrefixT{Subject}{has}{Attribute} & The \emph{subject} has the a certain \emph{attribute}. \\
+  \PrefixT{Subject}{is}{Type} & The \emph{subject} is an instance of \emph{type}. \\
+  \PrefixT{Subject}{must}{Task} & The \emph{subject} should try to satisfy the obligation. \\
+  \bottomrule\\
+\end{tabular}
+\end{minipage}
+
+\begin{table}
+  \footnotesize
+  \newcommand{\Obj}[1]{\textit{#1}}
+  \newcommand{\Sbj}[1]{\texttt{#1}}
+  \newcommand{\Sba}[2]{\Sbj{#1(}\Obj{#2}\Sbj{)}}
+\begin{tabular}{p{0.35\textwidth} p{0.65\textwidth}}
+  \toprule
+  Predicate & Description \\
+  \midrule
+  \Obj{App} \Sbj{isInstallable} & An \emph{app} can be installed. \\
+  \Obj{X} \Sba{hasManager}{Manager} & Specifies who \emph{X's}~manager is. \\
+  \Obj{Device} \Sba{mustDisable}{Feature} & The \emph{device} should ensure that the \emph{feature} is disabled. \\
+  TODO & Fill this in with most common ones and add longer list to appendix. \\
+  \bottomrule \\
+\end{tabular}
+\label{tab:predicates}
+\caption{Excerpt of Generalized predicates for BYOD policies.}
+\end{table}
+
+Using AppPAL we were able to translate 23 out of the 60 requriements in the NHS policy and XX out of the XX requirements in the SANS policy. \textbf{\large TODO: check these numbers properly}.  Sometimes this was because the requirement was not a policy rule but rather something the device owner should be aware of.  For example:
+
+\begin{quote}\footnotesize
+  \textbf{NHS}: \itshape 
+``In receiving a mobile device from the Trust, the individual receiving and using
+the device accepts that the device can be used to communicate through all
+corporate channels including voice calls, emails and texts and where appropriate
+enabled web applications, during working hours.''
+\end{quote}
+
+\begin{quote}\footnotesize
+  \textbf{NHS}: \itshape 
+``Individuals who have personal data of any kind stored on a corporately issued
+mobile device must be aware that in the event of loss of the device the above
+data wipe will include removal of all personal data.''
+\end{quote}
+
+In these cases no rule is needed as there is no behaviour we wish to control. 
+If we wished to use AppPAL to enforce these policies we could require device owners issue a statement acknowledging these limitations, similar to an EULA agreement.
+
+{\large \textbf{...actually this sounds like a good idea.  What percentage of these policies are acknowledgements.}}
+
+% 5 pages
+\section{The Details}
+\label{sec:details}
+
+
+\newcommand{\facts}[1]{\ensuremath \textsf{facts}\left(#1\right)}
+\newcommand{\reachable}[2]{\ensuremath \textsf{reachable}\left(#1,~#2\right)}
+\subsection{Checking Reachability}
+
+Inference in AppPAL happens by collecting ground facts and constraints that satisfy rules. 
+These rules are then combined to form a policy.
+If a rule is reachable then we would expect there to be some combination of facts that could satisfy the rule.
+If there are no facts that could satisfy the rule then this hints that the policy may be incomplete as there are policy rules that can never be satisfied.  
+
+\begin{equation}
+  \reachable{R}{AC}\equiv\exists p\in\facts{R}:~p\theta\subseteq AC
+\end{equation}
+Where $\facts{R}$ is the set of sets of facts and constraints that would satisfy rule $R$, and $\theta$ is an alpha-renaming of any variables in the set of facts such that equivalent free variable have the same name.
+
+We find all reachable assertions using the algorithm shown in~\autoref{alg:reachability} building a set of pairs of speakers and predicates.  If a pair is in the set then that predicate is said to be reachable from that speaker (i.e.~we can infer the speaker may say something about that predicate).  
+We search over all the assertions in the assertion context.  If all of an assetion's conditionals (the facts in the \emph{if} part) are reachable (or it has none) then the speaker and predicate is added to the reachable set.  If the statement is a can-say statement then we additionally check if the delegated predicate is reachable from the delgated speaker, and if so mark the delegated statement as reachable from the speaker who made the can-say statement.
+
+\begin{figure}
+\begin{algorithmic}
+\Procedure {Reachable}{AC}
+  \State reachable $\gets \emptyset$
+  \Repeat
+    \State iterate $\gets$ False
+    \ForAll {$a \in$ AC}
+      \State $e \gets $Speaker($a$)
+      \State $p \gets $Predicate($a$)
+      \If {$p~$:: CanSay $\wedge$ $(e,p)\in$ reachable}
+        \If {$($Delegator($p$)$,$ Delegation($p$)$)~\in$ reachable}
+          \If {$\forall c \in$ Conditions($a$)$.~(e,$ Predicate($c$)$) \in$ reachable}
+            \State reachable $\gets$ reachable $\cup$ ($e,$ Delegation($p$))
+            \State iterate $\gets$ True
+          \EndIf
+        \EndIf
+      \ElsIf {$(e,p)\not\in$ reachable}
+        \If {$\forall c \in$ Conditions($a$)$.~(e,$ Predicate($c$)$) \in$ reachable}
+          \State reachable $\gets$ reachable $\cup~(e,p)$
+          \State iterate $\gets$ True
+        \EndIf
+      \EndIf
+    \EndFor
+  \Until {iterate = True}
+  \State \textbf{return} reachable
+\EndProcedure
+\end{algorithmic}
+\caption{Procedure for finding all reachable assertions.}
+\label{alg:reachability}
+\end{figure}
+
+\subsection{Checking Redundancy}
+
+When checking for redundency we are looking for rules that will need the same or a subset of the ground facts and constraints to satisfy it.
+If one rule makes another redundant then the first rule will not only always be satisfied whenever the redundant one is, but may require less facts in order to satisfy it.
+
+Formally for any two rules $R$ and $R^\prime$; $R$ is said to be \emph{made redundant} by $R^\prime$ ($R\geq R^\prime$) if:
+\begin{equation}
+  R \geq R^\prime \equiv \forall p \in \facts{R}.~\exists p^\prime \in \facts{R^\prime}:~p\theta \supseteq p^\prime\theta
+\end{equation}
+If $R\geq R^\prime$ and $R\leq R^\prime$ then the two rules are equivalent (i.e. proving one will always prove the other).  This is particularly interesting if the two rules are for different predicates as it indicates that the two predicates may be equivalent also.
+  
+% 1-2 pages
+\section{Related Work}
+\label{sec:related}
+
+The policies present in the NHS organisation and hospitals have been an attractive target for the application of formal methods.
+There have been multiple attempts to present formalizations of electronic health records in both the Ponder~\cite{blobel_authorization_2004} and Cassandra~\cite{becker_cassandra_2004} policy languages.
+
+% 0.5 pages
+\section{Conclusions}
+\label{sec:conclusions}
+
+\bibliography{paper}{}
+\bibliographystyle{plain}
+\end{document}
