@@ -1,0 +1,134 @@
+\documentclass[a4paper]{article}
+
+\usepackage{microtype}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{acronym}
+\acrodef{MDM}{mobile device management}
+\acrodef{BYOD}{bring your own device}
+
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
+% \apppal{} and Listing formatting
+\usepackage{listings}
+\lstdefinelanguage{AppPAL}{%
+  morekeywords={if,inf,says,where,true,false},
+  otherkeywords={can-act-as,can-say},
+  sensitive=true,
+  morestring=[b]',
+  literate={\ inf\ }{{$\infty$}}5
+}[keywords,strings]
+\lstset{%
+  basicstyle=\ttfamily\footnotesize{},
+  stringstyle=\sffamily\footnotesize{},
+  keywordstyle=\ttfamily\slshape\footnotesize{},
+  language=AppPAL,
+  columns=flexible,
+  frame=single,
+  framesep=0.5pt,
+  framexleftmargin=2.5pt,
+  framexrightmargin=2.5pt,
+}
+
+\newcommand{\dotdotdot}[1]{#1}
+\newcommand{\etal}[0]{et~al{.}\@}
+\newcommand{\apppal}[0]{App{P}{A}{L}}
+
+\title{Case Study Reasoning about BYOD Policies in the Healthcare Sector}
+\author{Joseph Hallett and David Aspinall}
+\begin{document}
+\maketitle
+
+% 4 sentences
+\begin{abstract}
+  Implementing a \ac{BYOD} policy can be difficult especially in hospitals, where there is a need to balance privacy requirements against the need to treat patients.
+  It is common to publish a \ac{BYOD} policy to describe how staff should use their devices in the workplace.
+  These policies are written using natural language, and employees are expected to read and follow them: this can be tricky as the policies are often poorly specified.
+  We show how \apppal{}, a policy language for mobile app preferences, can be used as a tool for reasoning about policies and how it found issues with BYOD policies used in hospitals and as guidelines.
+\end{abstract}
+
+\section{Introduction}
+% 1 page
+\label{sec:intro}
+% 1. Describe the problem
+%    - BYOD hard
+%    - Hospitals are an interesting case
+%    - Need tools for reasoning about policies not enforcing
+
+Employees bringing their own devices to work has become the norm:
+  around 70\% of all companies having some form of \ac{BYOD} scheme~\cite{schulze_byod_2016}.
+In hospitals the use of personal devices as part of patient care is particularly common.
+One survey from the UK found that around 80\% of surgical doctors were willing to use their personal devices for work, with 85\% regularly using them to look up information, and 50\% having medical apps already installed on their phones~\cite{patel_uk_2015}.  Another from the US found similar numbers of physicians regularly using their devices as part of their work~\cite{moyer_managing_2013}.
+
+Several healthcare organisations have started looking into using mobile devices as part of patient care, and found that these devices may be helpful~\cite{prgomet_impact_2009,faulds_feasibility_2016}.  
+Organisations, such as the US's HiMMS~\cite{seymour_mobile_2012}, have published guidelines helping hospital administrators implement BYOD policies in their workplaces.  
+Additionally general advice for other organisations seeking to implement BYOD policies is available from SANS~\cite{nicholas_r._c._guerin_security_2008}, NIST~\cite{souppaya_guidelines_????}, HP~\cite{hp_byod_????} and the CESG~\cite{cesg_byod_2015} amongst others.
+The NHS has even published guidelines for developers seeking to develop apps for use in hospitals~\cite{prgomet_impact_2009}.
+
+Whilst there has been a push for bring \ac{BYOD} and mobile devices into the healthcare industry there has been push back against having mandated security policies automatically enforced.  
+The use of \ac{MDM} software to enforce policies can be problematic:
+  a survey found that even for companies that use \ac{MDM}, over half of them still have devices in their networks that do not meet their policies~\cite{mobileiron_security_labs_q4_2015}.
+In the healthcare industry the circumvention of security controls by physicians is normal, and in some cases taught as good practice~\cite{koppel_workarounds_2015}.
+The use of tools to automatically enforce policies in a hospital environment is not always the right approach:
+\emph{Moyer} concluded that:
+\emph{``Since mobile devices are already being used in hospitals, an approach toward educating the users instead of trying to control the technology may be more practical in the short term''}~\cite{moyer_managing_2013}.
+Similarly \emph{Faulds}~\etal~echo this sentiment noting that \emph{``concerns about data protection are legitimate''}, and going on to \emph{``encourage the Information Commissioner’s Office, in consultation with professional medical organisations, to publish guidance specific to the use of BYOD technology''}~\cite{faulds_feasibility_2016}.
+
+The conflict between patient care and data security, as well as \ac{MDM} software being relatively limited, has lead to \ac{BYOD} policies being published as natural language documents that employees are supposed to agree to follow.
+Using natural language in policies can create ambiguities, and lead to poorly specified rules.
+If a policy is poorly specified and confusing then its subjects may chose to ignore it or misinterpret it's rules.
+If we wish to improve our policies we need to be able to reason about them clearly.
+We need to be able to identify problems before they happen.
+
+% 2. State your contribution
+%    - Standard lexicon of predicates and idioms
+%    - Formalisation of several BYOD policies
+%    - Identification of problems in said policies
+%    - Methods for inferring when \apppal{} policies are problematic
+
+\apppal{} is a policy language for describing mobile app preferences~\cite{hallett_apppal_2016}.
+We show how \apppal{} can also be used to formalise \ac{BYOD} policies by translating three \ac{BYOD} policies into \apppal{}.
+One is taken from an NHS hospital trust~\cite{kennington_mobiles_2014}. 
+Another is from HiMMS published as an example policy to help hospitals design their own policies~\cite{healthcare_information_and_management_systems_society_mobile_2012}.
+The third is a  general policy from SANS to help organisations to develop their own \ac{BYOD} schemes~\cite{nicholas_r._c._guerin_security_2008}.
+Using these policies we suggest a standard lexicon of BYOD predicates and idioms for using when reasoning about \ac{BYOD} policies. 
+With the AppPAL formalisation we show how problems with reachability and redundancy can be identified automatically, and suggest where the policies could be improved.
+
+\section{My Idea}
+% 2 pages
+\label{sec:idea}
+
+% - Brief intro to apppal but mostly link to existing paper
+% - Give an overview of the different policies we're looking at
+% - Show differences and similarities between the policies
+% - Make sure to tie it all into healthcare, but also be clear this is more general
+
+\section{The Details}
+% 5 pages
+\label{sec:details}
+
+% - Show the standard predicates and explain how they help to give structure to apppal policies
+%   - show how they are tied into the trust relationships with patient care (i.e. consent)
+% - Show the consistency checker
+%   - Give algorithm and intuition
+%   - Show examples where it has found problems
+% - Show redundancy checks
+%   - Algorithm and intuition
+%   - Examples where problems were found
+
+
+
+  
+\section{Related Work}
+% 1-2 pages
+\label{sec:related}
+
+\section{Conclusions}
+% 0.5 pages
+\label{sec:conclusions}
+
+\bibliography{paper}{}
+\bibliographystyle{plain}
+\end{document}
+
