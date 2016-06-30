@@ -6,6 +6,7 @@
 \usepackage{acronym}
 \acrodef{MDM}{mobile device management}
 \acrodef{BYOD}{bring your own device}
+\acrodef{HiMMS}{Healthcare Information and Management Systems Society}
 
 \usepackage{algorithm}
 \usepackage{algpseudocode}
@@ -62,7 +63,7 @@ In hospitals the use of personal devices as part of patient care is particularly
 One survey from the UK found that around 80\% of surgical doctors were willing to use their personal devices for work, with 85\% regularly using them to look up information, and 50\% having medical apps already installed on their phones~\cite{patel_uk_2015}.  Another from the US found similar numbers of physicians regularly using their devices as part of their work~\cite{moyer_managing_2013}.
 
 Several healthcare organisations have started looking into using mobile devices as part of patient care, and found that these devices may be helpful~\cite{prgomet_impact_2009,faulds_feasibility_2016}.  
-Organisations, such as the US's HiMMS~\cite{seymour_mobile_2012}, have published guidelines helping hospital administrators implement BYOD policies in their workplaces.  
+Organisations, such as the US's \ac{HiMMS}~\cite{seymour_mobile_2012}, have published guidelines helping hospital administrators implement BYOD policies in their workplaces.  
 Additionally general advice for other organisations seeking to implement BYOD policies is available from SANS~\cite{nicholas_r._c._guerin_security_2008}, NIST~\cite{souppaya_guidelines_????}, HP~\cite{hp_byod_????} and the CESG~\cite{cesg_byod_2015} amongst others.
 The NHS has even published guidelines for developers seeking to develop apps for use in hospitals~\cite{prgomet_impact_2009}.
 
@@ -90,19 +91,73 @@ We need to be able to identify problems before they happen.
 \apppal{} is a policy language for describing mobile app preferences~\cite{hallett_apppal_2016}.
 We show how \apppal{} can also be used to formalise \ac{BYOD} policies by translating three \ac{BYOD} policies into \apppal{}.
 One is taken from an NHS hospital trust~\cite{kennington_mobiles_2014}. 
-Another is from HiMMS published as an example policy to help hospitals design their own policies~\cite{healthcare_information_and_management_systems_society_mobile_2012}.
+Another is from \ac{HiMMS} published as an example policy to help hospitals design their own policies~\cite{healthcare_information_and_management_systems_society_mobile_2012}.
 The third is a  general policy from SANS to help organisations to develop their own \ac{BYOD} schemes~\cite{nicholas_r._c._guerin_security_2008}.
 Using these policies we suggest a standard lexicon of BYOD predicates and idioms for using when reasoning about \ac{BYOD} policies. 
 With the AppPAL formalisation we show how problems with reachability and redundancy can be identified automatically, and suggest where the policies could be improved.
 
-\section{My Idea}
+%\section{My Idea}
+\section{Formalising policies using AppPAL}
 % 2 pages
 \label{sec:idea}
 
+Each of the three policies we have chosen to look at has a different style in expressing their rules.
+Despite the different styles, however, there are areas where the policies overlap and make similar rules.
+We present the policies here as excerpts alongside their AppPAL translations.
+The full translations and original policies can be found online\footnote{\url{https://github.com/apppal/apppal-byod-policy-translations}}.
+
+The \ac{HiMMS} policy is taken from their \emph{Mobile Security Toolkit} for assisting healthcare organisations and security practitioners in managing the security of their mobile computing devices. 
+\ac{HiMMS} itself is an American non-profit company advising healthcare companies on IT.
+Their policy~\cite{healthcare_information_and_management_systems_society_mobile_2012} takes the form of a short user agreement that it's subjects are expected to sign.  
+This gives a different style to the other policies: policies are expressed from the perspective of the subject, rather than as decrees from the policy authors.
+It also congtains many rules where the subject is expected to acknowledge a risk or regulation.  
+For example in one rule the subject is required to acknowledge that networks can be unreliable:
+\begin{lstlisting}[title={\footnotesize\textbf{\ac{HiMMS}}:~\itshape 
+I understand and accept that synchronisation relies on one or more cellular network providers and the Internet, and that both are subject to slowdowns and outages of extended duration that are beyond the control of IT.}]
+'himms' says User can-say User hasAcknowledged('internet-unreliable')
+  if User isUser.
+
+'himms' says User hasAgreeedToPolicy
+  if ...,  User hasAcknowledged('internet-unreliable').
+\end{lstlisting}
+These rules are interesting as on the face of them they do not say anything about security or how the subject should use their device.
+We translate rules like this into acknowledgement statements in AppPAL, which can be collected into a check that the user has acknowledged everything they should have done.
+
+The NHS policy~\cite{kennington_mobiles_2014}, in contrast, is a more prescriptive document.
+It is taken from the \emph{Torbay and Southern Devon NHS trust}\footnote{The NHS is organised into a series fo \emph{trusts}, each of which contains several hospitals.  A doctor may work at several hospitals within a trust.}. 
+It is interesting in part because it represents a \ac{BYOD} policy in actual use, but also because it is significantly more complex than most \ac{BYOD} policies as it goes beyond basic requirements such as requiring encryption by describing relationships between organisational groups within the trust and precise organisation specific requirements.
+Like the \ac{HiMMS} policy it has rules that just require an acknowledgement (for example Rule~3.2 requires that the device owner \emph{``accepts that the device can be used to communicate through all corporate channels''}) but there is a greater emphasis on the specifying the responsibilities of different groups and roles within the hospital.  For example in Rule~2.4 a staff member who has applied for a phone needs it to be signed off by a finance director and a relevant assistant director:
+\begin{lstlisting}[title={\footnotesize\textbf{\ac{NHS}}:~\itshape 
+Upon receipt of the completed application form, allocation will also need to be authorised by the relevant Assistant Director and the Director of Finance.}]
+'nhs-trust' says Staff hasAppliedForPhone(Form)
+  if Staff hasSubmitted(Form),
+     'assistant-director' hasAuthorized(Form),
+     'finance-director' hasAuthorized(Form).
+
+'nhs-trust' says X can-say 'assistant-director' hasAuthorized(Form)
+  if X can-act-as 'assistant-director',
+     Staff hasSubmitted(Form),
+     X isManagerOf(Staff).
+\end{lstlisting}
+
+The SANS Institute is a private US company that specialise in information security.
+Whilst their example \ac{BYOD} policy is not healthcare specific, it is still interesting as there advice is widely regarded, and contains more general security advice.
+The SANS \ac{BYOD} policy is split into sections that describe how device features, such as Bluetooth or OTA provisioning, should be configured.  Some rules are acknowledgements: for example the use of internet services in Section~2.8 requires acknowledgement of the email security, acceptable use and an eCommerce security policy.
+Many rules describe when device features should be disabled, in contrast to the other two policies which tend to favor describing when features can be used.
+For example in Section~2.4 the SANS policy states that infrared support should be disabled if Blutooth is available: this is easilly expressed in AppPAL:
+\begin{lstlisting}[title={\footnotesize\textbf{\ac{SANS}}:~\itshape 
+Infrared supported MUST be disabled if Bluetooth connectivity is supported.}]
+'sans' says Device shouldDisable('irda')
+  if Device hasFeature('bluetooth').
+\end{lstlisting}
+
 % - Brief intro to apppal but mostly link to existing paper
+%   - Why apppal?
 % - Give an overview of the different policies we're looking at
 % - Show differences and similarities between the policies
 % - Make sure to tie it all into healthcare, but also be clear this is more general
+
+
 
 \section{The Details}
 % 5 pages
