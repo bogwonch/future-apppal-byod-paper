@@ -187,6 +187,92 @@ These are compiled alongside the main AppPAL interpreter and may be run from the
 %   - Algorithm and intuition
 %   - Examples where problems were found
 
+\subsection{Policy Idioms}
+
+\subsection{Checking Reachability}
+
+Inference in AppPAL happens by collecting ground facts and constraints that satisfy rules.
+These rules are then combined to form a policy. 
+If a rule is reachable then we would expect there to be some combination of facts that could satisfy the rule.
+If there are no facts that could satisfy the rule then this suggests that the policy may be incomplete as there are policy rules that can never be satisfied.  
+
+We search for reachable assertions using the algorithm in Listing~\ref{alg:reachable}:
+it produces a set of pairs of predicates and speakers where the a pair of a speaker and a predicate indicates that that speaker may say something about that predicate.
+We search over all the assertions in the AppPAL assertion context.
+If all of an assertion's conditionals (the facts in the if part) are reachable (or it has none) then the speaker and predicate are added to the reachable set.
+If the statement is a can-say statement then we additionally check if the delegated predicate is reachable from the delegated speaker, and if so mark the delegated statement as reachable from the speaker who made the can-say statement.
+
+\begin{lstlisting}[language=Python,float,caption={Procedure for finding all reachable assertions.},label={alg:reachable}]
+def reachable(ac) -> set:
+  reachable = new set()
+  iterate = True
+  while iterate == True:
+    iterate = False
+    for assertion in ac:
+      e = a.speaker
+      p = a.predicate
+      if p.isCanSay() and (e, p) in reachable:
+        if (p.delegator, p.delegation) in reachable:
+          if for all c in a.conditions: (e, c.predicate) in reachable:
+            reachable.add((e, p.delegation))
+            iterate = True
+      else if not (e, p) in reachable:
+        if for all c in a.conditions; (e, c.predicate) in reachable:
+          reachable.add((e, p))
+          iterate = True
+  return reachable
+\end{lstlisting}
+
+\subsection{Checking Redundancy}
+
+To check redundancy we convert the policy into a graph structure.
+Each statement we might want to prove (a goal) becomes a node in the graph, its children are organised into sets of goals (a proof), where if all the goals in any set were proved true then the goal node would also become true.
+If a node has an empty set of goals to prove it is a fact.
+Once the graph has been constructed (taking into account delegation and unification with other statements), the graph is flattened by applying the flatten procedure (Listing~\ref{alg:flatten}) repeatedly until a fixed point is reached.
+When the graph has been flattened we look for redundancy by looking for goals with proofs that are subsets of their other proofs, implying that if the larger proof is true, then the shorter proof will always be true too; 
+  and different goals with identical proofs, implying that the two decisions are not independent~(Listing~\ref{alg:redundancy}).
+
+\begin{lstlisting}[language=Python,float,caption={Procedure for flattening the redundancy graph.},label={alg:flatten}]
+def flatten(graph):
+  for goal in graph.goals:
+    hoist = true
+    for proof in graph[goal]:
+      for proof_goal in proof:
+        if not proof_goal.is_fact:
+          hoist = False
+          break
+    if hoist == True:
+      hoist(graph, goal)
+
+def hoist(graph, target):
+  for parent in graph[target].parents:
+    for proof in parent.proofs:
+      if proof.uses(target):
+        for replacements in graph[target].parents:
+          parent.proofs += proof.replace(target, replacements)
+        parent.proofs -= proof
+\end{lstlisting}
+
+\begin{lstlisting}[language=Python,float,caption={Procedure to check for redundancy.},label={alg:redundancy}]
+def check_redundancy(graph) -> boolean:
+  for goal in graph.goals:
+    for a in graph[goal]:
+      for b in graph[goal]:
+        if a >= b and a.goals.subset(b.goals):
+          if b.goals.subset(a.goals):
+            warn(a+" has multiple equivalent proofs") 
+          else
+            warn(a+" has a redundant proof")
+    for other_goal in graph.goals:
+      if goal > other_goal:
+        for a in graph[goal]:
+          for b in graph[other_goal]:
+            if not (a.goals.is_empty() or b.is_empty())
+               and a.goals == b.goals:
+              warn(a+" and "+b+" have equivalent proofs")
+\end{lstlisting}
+
+
 \section{Related Work}
 % 1-2 pages
 \label{sec:related}
