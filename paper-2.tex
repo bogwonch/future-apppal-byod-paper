@@ -127,7 +127,7 @@ The NHS policy~\cite{kennington_mobiles_2014}, in contrast, is a more prescripti
 It is taken from the \emph{Torbay and Southern Devon NHS trust}\footnote{The NHS is organised into a series of \emph{trusts}, each of which contains several hospitals.  A doctor may work at several hospitals within a trust.}. 
 It is interesting in part because it represents a \ac{BYOD} policy in actual use, but also because it is significantly more complex than most \ac{BYOD} policies as it goes beyond basic requirements such as requiring encryption by describing relationships between organisational groups within the trust and precise organisation specific requirements.
 Like the \ac{HiMMS} policy it has rules that just require an acknowledgement (for example Rule~3.2 requires that the device owner \emph{``accepts that the device can be used to communicate through all corporate channels''}) but there is a greater emphasis on the specifying the responsibilities of different groups and roles within the hospital.  For example in Rule~2.4 a staff member who has applied for a phone needs it to be signed off by a finance director and a relevant assistant director:
-\begin{lstlisting}[title={\footnotesize\textbf{\ac{NHS}}:~\itshape 
+\begin{lstlisting}[title={\footnotesize\textbf{NHS}:~\itshape 
 Upon receipt of the completed application form, allocation will also need to be authorised by the relevant Assistant Director and the Director of Finance.}]
 'nhs-trust' says Staff hasAppliedForPhone(Form)
   if Staff hasSubmitted(Form),
@@ -145,7 +145,7 @@ Whilst their example \ac{BYOD} policy is not healthcare specific, it is still in
 The SANS \ac{BYOD} policy is split into sections that describe how device features, such as Bluetooth or OTA provisioning, should be configured.  Some rules are acknowledgements: for example the use of internet services in Section~2.8 requires acknowledgement of the email security, acceptable use and an eCommerce security policy.
 Many rules describe when device features should be disabled, in contrast to the other two policies which tend to favor describing when features can be used.
 For example in Section~2.4 the SANS policy states that infrared support should be disabled if Bluetooth is available: this is easily expressed in AppPAL:
-\begin{lstlisting}[title={\footnotesize\textbf{\ac{SANS}}:~\itshape 
+\begin{lstlisting}[title={\footnotesize\textbf{SANS}:~\itshape 
 Infrared supported MUST be disabled if Bluetooth connectivity is supported.}]
 'sans' says Device shouldDisable('irda')
   if Device hasFeature('bluetooth').
@@ -188,6 +188,27 @@ These are compiled alongside the main AppPAL interpreter and may be run from the
 %   - Examples where problems were found
 
 \subsection{Policy Idioms}
+
+When translating the \ac{BYOD} policies we found types of actions or checks being performed.
+There are checks if things are of a particular type (for~example in the NHS policy rule~2.1  a staff member is elligable for a mobile device if they are lone-working, work out-of-hours and work out-of-office).  
+There are checks if an action is allowed (such~as whether they can connect to an wireless access point in the \ac{HiMMS} policy);  and checks to see if an action has already been performed (like the need to have acknowledged a policy in all three policies).
+We also find policy rules that state the user should perform an action (such as disabling phone functionality in the SANS policy, or an obligation to report a phone missing in the NHS policy).
+
+To help structure the formalisation we give the AppPAL predicates used to translate the policies prefixes.
+The prefixes help to clarify the meaning of each predicate and groups the predicates into four categories.
+
+\begin{tabular}{l l}
+  \toprule
+  Predicate & Meaning \\
+  \midrule
+  \textit{Subject} \texttt{can}\textit{Action}  & The \emph{subject} is allowed to perform the \emph{action}. \\
+  \textit{Subject} \texttt{has}\textit{Action}  & The \emph{subject} has performed the \emph{action}. \\
+  \textit{Subject} \texttt{is}\textit{Propery}  & The \emph{property} is true about the \emph{subject}. \\
+  \textit{Subject} \texttt{must}\textit{Action} & The \emph{subject} is obliged to perform the action. \\
+  \bottomrule \\
+\end{tabular}
+
+
 
 \subsection{Checking Reachability}
 
@@ -276,6 +297,8 @@ def check_redundancy(graph) -> boolean:
 \section{Related Work}
 % 1-2 pages
 \label{sec:related}
+
+Armando~\etal~created a BYODroid~\cite{armando_bring_2013}; \ac{BYOD} framework to enforce \ac{BYOD} policies by extending Featherweight Java~\cite{igarashi_featherweight_2001} with a type system that can describe how Android apps interact.  Whilst this work gives a framework for enforcing policies on Android, it doesn't help policy authors decide what the policies should be to begin with.
 
 \section{Conclusions}
 % 0.5 pages
