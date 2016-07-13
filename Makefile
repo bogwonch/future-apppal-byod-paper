@@ -1,4 +1,4 @@
-all: paper-2.pdf
+all: paper.pdf
 
 %.pdf: %.tex
 	latexmk -pdf ${<}
