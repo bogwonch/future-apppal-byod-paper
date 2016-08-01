@@ -230,7 +230,7 @@ This idiom is particularly common in the \ac{HiMSS} policy where over the rules 
 Similarly in the longer NHS policy almost a quarter of the rules require the subject to acknowledge a rule.
 In contrast the more technically focussed SANS policy has only one occurance of the idiom, when describing the other policies a user should be following in order to use a mobile device.
 
-\begin{lstlisting}[title={\footnotesize\textbf{\ac{SANS}}:~\itshape 
+\begin{lstlisting}[title={\footnotesize\textbf{SANS}:~\itshape 
 Users MUST agree to the email security/acceptable use policy and eventually to the eCommerce security policy.}]
 'company' says User canUse(Device) 
   if User hasDevice(Device),
@@ -240,21 +240,82 @@ Users MUST agree to the email security/acceptable use policy and eventually to t
 \end{lstlisting}
 
 The reliance in both the NHS and \ac{HiMSS} policies suggests that \ac{BYOD} policies often go beyond technical rules; something ignored in previous work on policy formalisation.
-These policies often require that employees \emph{follow the rules}, and have an awareness of the systems surrounding them.
+These policies often require that employees \emph{follow the rules}, and have an awareness of the systems surrounding them;
+  something which cannot be checked by static analysis.
 
 \begin{table}\centering
   \begin{tabular}{l c c c}
     \toprule
-    Idiom                    & \ac{HiMSS}   & NHS      & SANS    \\
+    Idiom                    & \ac{HiMSS} & NHS       & SANS      \\
     \midrule
-    Acknowledgement          & 5 (33\%) & 9 (18\%) & 1 (3\%) \\
-    Partial Acknowledgement  & 3 (20\%) & 2 (4\%)  & 0       \\
+    Acknowledgement          & 5 (33\%)   & 9 (18\%)  & 1 (3\%)   \\
+    Partial Acknowledgement  & 3 (20\%)   & 2 (4\%)   & 0         \\
+    Delegation               & 6 (40\%)   & 15 (30\%) & 14 (42\%) \\
     \bottomrule             \\
   \end{tabular}
   \label{tab:idioms}
   \caption{Occurences of policy idioms in each of the \ac{BYOD} policies.}
 \end{table}
 
+\subsection{Delegating Responsibility}
+
+When describing rules employees must follow, there are often aspects of the rules that require other employees and departments to sign off on.
+For example in the NHS policy for an employee to be able to use a \ac{BYOD} phone the finance director and relevant assistant director must both sign off on it.
+
+\begin{lstlisting}[title={\footnotesize\textbf{\ac{NHS}}:\itshape
+Upon receipt of the completed application form, allocation will need to be authorised by the relevant Assistant Director and the Director of Finance.}]
+'nhs-trust' says Form isAuthorised
+  if Staff hasAppliedForPhone(Form),
+     FD hasAuthorised(Form),
+     FD isFinanceDirector,
+     AD hasAuthorized(Form),
+     AD isAssistantDirector,
+     AD isManagerOf(Staff).
+
+
+'nhs-trust' says X can-say X hasAuthorised(Form)
+  if X isEmployee,
+     Form isForm.
+\end{lstlisting}
+
+These delegations start to show some of the different responsibilities of the different employees.
+Later in the NHS policy we find a rule that it is an employee's line manager's responsibility to sign off on the use of a paid app:
+
+\begin{lstlisting}[title={\footnotesize\textbf{NHS}:\itshape
+Use of paid apps must be agreed in advance with the device holder's line manager and their should be a demonstrable benefit.}]
+'nhs-trust' says Manager can-say
+  Staff canInstall(App)
+  if App isPaidApp,
+     Manager isManagerOf(Staff).
+\end{lstlisting}
+
+This highlights that the policy is incomplete: different managers may have different criteria for what constitutes an \emph{demonstrable benefit}.
+It is not the policy's job to state precisely for the manager what is beneficial or not, but rather to indicate that it is the manager's call.
+The manager could specify their requirements as a formal series of rules expressed in AppPAL and enforced by their favorite \ac{MDM} tool, or they could specify apps on a case by case basis for each employee that asks.
+
+These relationships are often ignored by existing BYOD policy tools, which focus on how a manager's policy could be implemented by restricting the functionality of the individual apps.  In this work we're more interested in who makes the decision and what decisions they make rather than the mechanism for enforcing their policies.  When modelling these policies it is necessary to use a formalism that supports delegation, such as AppPAL, to capture these requirements.
+
+Using AppPAL we model these kinds of decisions using delegation with the \emph{can-say} statement.
+All three policies contain some form of delegation relationships: in the \ac{HiMSS} policy it is the responsibility of the management to decide is a device must be wiped:
+\begin{lstlisting}[title={\footnotesize\textbf{\ac{HiMSS}}:\itshape
+I agree that the PDA/Smartphone can be wiped by XYZ Health System upon the decision of XYZ Health System management.}]
+'user' says 'xyz-health-system' can-say
+  Device mustBeErased
+  if 'user' hasDevice(Device).
+\end{lstlisting}
+In the SANS policy only the devices identified by the IT-Department can connect to internal networks and decide the access control policies:
+\begin{lstlisting}[title={\footnotesize\textbf{\ac{HiMSS}}:\itshape
+All devices, including handhelds that have to connect to internal networks MUST be identified by IT department}]
+'company' says Device canConnectTo(Network)
+  if Network isInternalNetwork,
+     Device isIdentified.
+
+'company' says 'it-department' can-say
+  Device isIdentified
+  if Device isDevice.
+\end{lstlisting}
+All three policies make extensive use of delegation patterns. 
+In the NHS policy acknowledgements are implemented by delegating to the user to make the statement, where as in the \ac{HiMSS} policy they are given as straight assertions as the \ac{HiMSS} policy is implemented from the view of the user. The SANS policy supposes your company has several different departments each with their own specialities (such as IT, security and desktop support personnel), each of which is delegated to for approriate decisions.
 
 \subsection{Checking Reachability}
 
