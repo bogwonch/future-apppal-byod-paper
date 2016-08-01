@@ -255,6 +255,11 @@ These policies often require that employees \emph{follow the rules}, and have an
   \caption{Occurences of policy idioms in each of the \ac{BYOD} policies.}
 \end{table}
 
+\subsection{Delegation}
+\textit{About a page to be merged from the other machine you forgot to push. }
+
+
+
 
 \subsection{Checking Reachability}
 
@@ -339,12 +344,54 @@ def check_redundancy(graph) -> boolean:
               warn(a+" and "+b+" have equivalent proofs")
 \end{lstlisting}
 
-
 \section{Related Work}
 % 1-2 pages
 \label{sec:related}
 
-Armando~\etal~created a BYODroid~\cite{armando_bring_2013}; \ac{BYOD} framework to enforce \ac{BYOD} policies by extending Featherweight Java~\cite{igarashi_featherweight_2001} with a type system that can describe how Android apps interact.  Whilst this work gives a framework for enforcing policies on Android, it doesn't help policy authors decide what the policies should be to begin with.
+Armando~\etal~created a BYODroid~\cite{armando_bring_2013}; \ac{BYOD} framework
+to enforce \ac{BYOD} policies by extending Featherweight
+Java~\cite{igarashi_featherweight_2001} with a type system that can describe how
+Android apps interact. Whilst this work gives a framework for enforcing policies
+on Android, it doesn't help policy authors decide what the policies should be to
+begin with. They went on to show how BYODroid could be used to enforce a {NATO}
+Communications and Information Agency policy~\cite{armando_developing_2016}.
+Armando~\etal also proposed creating curated app stores based on corporate BYOD
+policies~\cite{armando_enabling_2014}. To do this they analysed a BYOD policy
+taken from the US Government BYOD Security
+Guidelines~\cite{digital_services_advisory_group_and_federal_chief_information_officers_council_bring_????}~and
+translated it into rules in the CONspec~\cite{aktug_conspec_2008} language which
+allows a low-level description of app behavior based on Java code. They then
+used these rules to filter apps for their store from a selection of 860 apps
+taken from the \emph{top selling free} section of the Google Play store.
+
+Martinelli~\etal~applied the UCON security model to describe \ac{BYOD} policies
+for Android~\cite{martinelli_enhancing_2016}. Using this model they created an
+enforcement framework that could alter the permissions granted to Android apps
+at run time. This framework requires a rooted device for most Android versions,
+however, they do claim it should work without modification on the latest
+version. Again like the work of Armando~\etal, this gives a framework for
+enforcement but without consideration of what the policies should be enforcing.
+
+Hong~\etal~focussedon the network aspects of a \ac{BYOD} policy with their
+PBS-Droid tool~\cite{sungmin_hong_towards_2016}.  PBS-Droid allowed BYOD policy
+authors the ability to sandbox individual apps into their own software-defined
+networks giving finer control over how individual apps interact with a companies
+networks and allowing for dynamic policy enforcement and network configuration.
+
+For more general mobile policies, there has been extensive work in both
+modeling and enforcing various policies.  Sadeh~\etal~surveyed users to find
+their privacy preferences and found four different types of user each with
+different privacy policies~\cite{sadeh_understanding_2009}.  Various tools have
+been proposed that can enforce app behavior policies.  Aurasium works by
+repackaging apps to use modified APIs~\cite{xu_aurasium:_2012}.  These APIs can
+enforce policies to protect a user's personal information or prevent sending
+premium rate text messages.  Another tool, CRePE~\cite{conti_crepe:_2010}
+modifies Android to provide a framework that can enforce policies based
+on the contextual information, such as the device's location or battery level.
+The SEAR tool takes a different approach and actively scans apps for
+vulnerabilities over collections of apps.  It then outputs security policies
+that users might want to enforce in order to prevent attacks from occurring in
+the first place~\cite{bagheri_practical_2016}.
 
 \section{Conclusions}
 % 0.5 pages
