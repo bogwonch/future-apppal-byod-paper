@@ -1,457 +1,70 @@
-\documentclass[a4paper]{article}
+\documentclass{article}
 
 \usepackage{microtype}
-\usepackage{booktabs}
-\usepackage{hyperref}
+
 \usepackage{acronym}
-\acrodef{MDM}{mobile device management}
-\acrodef{BYOD}{bring your own device}
-\acrodef{HiMSS}{Healthcare Information and Management Systems Society}
+\acrodef{MDM}{Mobile Device Management}
 
-\usepackage{algorithm}
-\usepackage{algpseudocode}
-
-% \apppal{} and Listing formatting
-\usepackage{listings}
-\lstdefinelanguage{AppPAL}{%
-  morekeywords={if,inf,says,where,true,false},
-  otherkeywords={can-act-as,can-say},
-  sensitive=true,
-  morestring=[b]',
-  literate={\ inf\ }{{$\infty$}}5
-}[keywords,strings]
-\lstset{%
-  basicstyle=\ttfamily\footnotesize{},
-  stringstyle=\sffamily\footnotesize{},
-  keywordstyle=\ttfamily\slshape\footnotesize{},
-  language=AppPAL,
-  columns=flexible,
-  frame=single,
-  framesep=0.5pt,
-  framexleftmargin=2.5pt,
-  framexrightmargin=2.5pt,
-}
-
-\newcommand{\dotdotdot}[1]{#1}
-\newcommand{\etal}[0]{et~al{.}\@}
-\newcommand{\apppal}[0]{App{P}{A}{L}}
-
-\title{Case Study Reasoning about BYOD Policies in the Healthcare Sector}
+\title{Capturing Policies for BYOD}
 \author{Joseph Hallett and David Aspinall}
 \begin{document}
 \maketitle
 
-% 4 sentences
 \begin{abstract}
-  Implementing a \ac{BYOD} policy can be difficult especially in hospitals, where there is a need to balance privacy requirements against the need to treat patients.
-  It is common to publish a \ac{BYOD} policy to describe how staff should use their devices in the workplace.
-  These policies are written using natural language, and employees are expected to read and follow them: this can be tricky as the policies are often poorly specified.
-  We show how \apppal{}, a policy language for mobile app preferences, can be used as a tool for reasoning about policies and how it found issues with BYOD policies used in hospitals and as guidelines.
+  % 4 Sentences
 \end{abstract}
 
 \section{Introduction}
-% 1 page
 \label{sec:intro}
-% 1. Describe the problem
-%    - BYOD hard
-%    - Hospitals are an interesting case
-%    - Need tools for reasoning about policies not enforcing
+% Describe the problem
+% State my contribution
+% 1 page
 
-Employees bringing their own devices to work has become the norm:
-  around 70\% of all companies having some form of \ac{BYOD} scheme~\cite{schulze_byod_2016}.
-In hospitals the use of personal devices as part of patient care is particularly common.
-One survey from the UK found that around 80\% of surgical doctors were willing to use their personal devices for work, with 85\% regularly using them to look up information, and 50\% having medical apps already installed on their phones~\cite{patel_uk_2015}.  Another from the US found similar numbers of physicians regularly using their devices as part of their work~\cite{moyer_managing_2013}.
+Employees bring their own devices to work.  
+In the past employees might have had a dedicated company device. 
+Today around 70\% of companies have a BYOD scheme~\cite{schulze_byod_2016} and, in some fields,
+  85\% of staff use their personal devices to look up work-sensitive information~\cite{patel_uk_2015}. 
+This creates a challenge for IT departments.
+They need to control access to company resources, but have limited control over the devices used to access them.
 
-Several healthcare organisations have started looking into using mobile devices as part of patient care, and found that these devices may be helpful~\cite{prgomet_impact_2009,faulds_feasibility_2016}.  
-Organisations, such as the US's \ac{HiMSS}~\cite{seymour_mobile_2012}, have published guidelines helping hospital administrators implement BYOD policies in their workplaces.  
-Additionally general advice for other organisations seeking to implement BYOD policies is available from SANS~\cite{nicholas_r._c._guerin_security_2008}, NIST~\cite{souppaya_guidelines_????}, HP~\cite{hp_byod_????} and the CESG~\cite{cesg_byod_2015} amongst others.
-The NHS has even published guidelines for developers seeking to develop apps for use in hospitals~\cite{prgomet_impact_2009}.
+One common solution to control devices is to require users to agree to follow a policy.
+These policies take the form of user agreements, written in natural language, which describe how the devices should be used and configured.
+Various guides are available for companies wishing to implement a policy from governments, standards bodies, and companies seeking to advise~\cite{nicholas_r._c._guerin_security_2008,souppaya_guidelines_????,hp_byod_????,cesg_byod_2015}.
+On top of user agreements companies may also use \ac{MDM} software, which can enforce some policies automatically.
+The use of \ac{MDM} software does not guarantee compliance however.
+One survey found over 50\% of companies with \ac{MDM} software still have uncompliant devices in their networks~\cite{mobileiron_security_labs_q4_2015}.
 
-Whilst there has been a push for bring \ac{BYOD} and mobile devices into the healthcare industry there has been push back against having mandated security policies automatically enforced.  
-The use of \ac{MDM} software to enforce policies can be problematic:
-  a survey found that even for companies that use \ac{MDM}, over half of them still have devices in their networks that do not meet their policies~\cite{mobileiron_security_labs_q4_2015}.
-In the healthcare industry the circumvention of security controls by physicians is normal, and in some cases taught as good practice~\cite{koppel_workarounds_2015}.
-The use of tools to automatically enforce policies in a hospital environment is not always the right approach:
-\emph{Moyer} concluded that:
-\emph{``Since mobile devices are already being used in hospitals, an approach toward educating the users instead of trying to control the technology may be more practical in the short term''}~\cite{moyer_managing_2013}.
-Similarly \emph{Faulds}~\etal~echo this sentiment noting that \emph{``concerns about data protection are legitimate''}, and going on to \emph{``encourage the Information Commissioner’s Office, in consultation with professional medical organisations, to publish guidance specific to the use of BYOD technology''}~\cite{faulds_feasibility_2016}.
+BYOD policies are becoming more complex and \ac{MDM} software is becoming more proficient.
+There has been much work looking at developing the \ac{MDM} software to enforce aspects of BYOD policies~\cite{costantino_towards_2013,martinelli_enhancing_2016,armando_enabling_2014}.
+Enforcing a policy is only part of the problem, however.
+BYOD policies are specified informally using natural language, and they contain more than just access control decisions.
+These policies describe trust relationships inside the company between the IT departments, users, and HR each who may be delegated to make decisions and provide rules.
+Policies contain rules that require employees to acknowledge risks, and regulations.
+An antivirus or \ac{MDM} program may be used to \emph{implement} part of a policy, but it is the policy which \emph{specifies} which software to use and when; there is no automatic way to check how a policy has been implemented and by what.
 
-The conflict between patient care and data security, as well as \ac{MDM} software being relatively limited, has lead to \ac{BYOD} policies being published as natural language documents that employees are supposed to agree to follow.
-Using natural language in policies can create ambiguities, and lead to poorly specified rules.
-If a policy is poorly specified and confusing then its subjects may chose to ignore it or misinterpret it's rules.
-If we wish to improve our policies we need to be able to reason about them clearly.
-We need to be able to identify problems before they happen.
+This paper describes a formalization of five BYOD policies using AppPAL---a policy language for mobile device privacy preferences~\cite{hallett_apppal_2016}.
+Using our formalization we identify the common concerns and trust relationships in these policies.
+We show how AppPAL can be used to implement these policies, and describe precisely the different trust relationships.
+AppPAL is an instantiation of the SecPAL authorization language~\cite{becker_secpal:_2010} for mobile device policies.
+We have found, however, that it is a good fit for other policies surround the mobile ecosystem as well~\cite{hallett_specifying_2016}.
 
-% 2. State your contribution
-%    - Standard lexicon of predicates and idioms
-%    - Formalisation of several BYOD policies
-%    - Identification of problems in said policies
-%    - Methods for inferring when \apppal{} policies are problematic
-
-\apppal{} is a policy language for describing mobile app preferences~\cite{hallett_apppal_2016}.
-We show how \apppal{} can also be used to formalise \ac{BYOD} policies by translating three \ac{BYOD} policies into \apppal{}.
-One is taken from an NHS hospital trust~\cite{kennington_mobiles_2014}. 
-Another is from \ac{HiMSS} published as an example policy to help hospitals design their own policies~\cite{healthcare_information_and_management_systems_society_mobile_2012}.
-The third is a  general policy from SANS to help organisations to develop their own \ac{BYOD} schemes~\cite{nicholas_r._c._guerin_security_2008}.
-Using these policies we suggest a standard lexicon of BYOD predicates and idioms for using when reasoning about \ac{BYOD} policies. 
-With the AppPAL formalisation we show how problems with reachability and redundancy can be identified automatically, and suggest where the policies could be improved.
-
-%\section{My Idea}
-\section{Formalising policies using AppPAL}
-% 2 pages
+\section{My Idea}
 \label{sec:idea}
-
-Each of the three policies we have chosen to look at has a different style in expressing their rules.
-Despite the different styles, however, there are areas where the policies overlap and make similar rules.
-We present the policies here as excerpts alongside their AppPAL translations.
-The full translations and original policies can be found online\footnote{\url{https://github.com/apppal/apppal-byod-policy-translations}}.
-
-The \ac{HiMSS} policy is taken from their \emph{Mobile Security Toolkit} for assisting healthcare organisations and security practitioners in managing the security of their mobile computing devices. 
-\ac{HiMSS} itself is an American non-profit company advising healthcare companies on IT.
-Their policy~\cite{healthcare_information_and_management_systems_society_mobile_2012} takes the form of a short user agreement that it's subjects are expected to sign.  
-This gives a different style to the other policies: policies are expressed from the perspective of the subject, rather than as decrees from the policy authors.
-It also contains many rules where the subject is expected to acknowledge a risk or regulation.  
-For example in one rule the subject is required to acknowledge that networks can be unreliable:
-\begin{lstlisting}[title={\footnotesize\textbf{\ac{HiMSS}}:~\itshape 
-I understand and accept that synchronisation relies on one or more cellular network providers and the Internet, and that both are subject to slowdowns and outages of extended duration that are beyond the control of IT.}]
-'ac{HiMSS}' says User can-say User hasAcknowledged('internet-unreliable')
-  if User isUser.
-
-'ac{HiMSS}' says User hasAgreeedToPolicy
-  if ...,  User hasAcknowledged('internet-unreliable').
-\end{lstlisting}
-These rules are interesting as on the face of them they do not say anything about security or how the subject should use their device.
-We translate rules like this into acknowledgement statements in AppPAL, which can be collected into a check that the user has acknowledged everything they should have done.
-
-The NHS policy~\cite{kennington_mobiles_2014}, in contrast, is a more prescriptive document.
-It is taken from the \emph{Torbay and Southern Devon NHS trust}\footnote{The NHS is organised into a series of \emph{trusts}, each of which contains several hospitals.  A doctor may work at several hospitals within a trust.}. 
-It is interesting in part because it represents a \ac{BYOD} policy in actual use, but also because it is significantly more complex than most \ac{BYOD} policies as it goes beyond basic requirements such as requiring encryption by describing relationships between organisational groups within the trust and precise organisation specific requirements.
-Like the \ac{HiMSS} policy it has rules that just require an acknowledgement (for example Rule~3.2 requires that the device owner \emph{``accepts that the device can be used to communicate through all corporate channels''}) but there is a greater emphasis on the specifying the responsibilities of different groups and roles within the hospital.  For example in Rule~2.4 a staff member who has applied for a phone needs it to be signed off by a finance director and a relevant assistant director:
-\begin{lstlisting}[title={\footnotesize\textbf{NHS}:~\itshape 
-Upon receipt of the completed application form, allocation will also need to be authorised by the relevant Assistant Director and the Director of Finance.}]
-'nhs-trust' says Staff hasAppliedForPhone(Form)
-  if Staff hasSubmitted(Form),
-     'assistant-director' hasAuthorized(Form),
-     'finance-director' hasAuthorized(Form).
-
-'nhs-trust' says X can-say 'assistant-director' hasAuthorized(Form)
-  if X can-act-as 'assistant-director',
-     Staff hasSubmitted(Form),
-     X isManagerOf(Staff).
-\end{lstlisting}
-
-The SANS Institute is a private US company that specialise in information security.
-Whilst their example \ac{BYOD} policy is not healthcare specific, it is still interesting as there advice is widely regarded, and contains more general security advice.
-The SANS \ac{BYOD} policy is split into sections that describe how device features, such as Bluetooth or OTA provisioning, should be configured.  Some rules are acknowledgements: for example the use of internet services in Section~2.8 requires acknowledgement of the email security, acceptable use and an eCommerce security policy.
-Many rules describe when device features should be disabled, in contrast to the other two policies which tend to favor describing when features can be used.
-For example in Section~2.4 the SANS policy states that infrared support should be disabled if Bluetooth is available: this is easily expressed in AppPAL:
-\begin{lstlisting}[title={\footnotesize\textbf{SANS}:~\itshape 
-Infrared supported MUST be disabled if Bluetooth connectivity is supported.}]
-'sans' says Device shouldDisable('irda')
-  if Device hasFeature('bluetooth').
-\end{lstlisting}
-
-% - Brief intro to apppal but mostly link to existing paper
-%   - Why apppal?
-% - Give an overview of the different policies we're looking at
-% - Show differences and similarities between the policies
-% - Make sure to tie it all into healthcare, but also be clear this is more general
-
-\subsection{Why AppPAL?}
-
-AppPAL is an authorization language designed to model app preferences~\cite{hallett_apppal_2016}.
-It was created by instantiating the SecPAL language (which was designed for access control in distributed computing environments~\cite{becker_secpal:_2010}) with predicates and checking functions for describing apps.
-It supports delegation, roles and constraints including arbitrary external checking programs to describe precisely what apps users might want to use.
-
-AppPAL (and SecPAL) is designed to be readable.
-It is powerful enough to describe complex policies and rules, whilst also being semantically simple having only three rules for evaluation.
-When reasoning about \ac{BYOD} policies, it simplicity and readability gives it an advantage over more powerful languages such as XACML~\cite{oasis_extensible_2013} as a rule written in AppPAL can be comprehended quickly.
-Whilst an end-user might not write a policy in a formal language, an IT administrator might wish to use a formal language to aid with reasoning and checking the policies they write.
-AppPAL gives these IT professionals an easy entry point to formal methods, without over complicating things.
-Early experiments showed that AppPAL can describe \ac{BYOD} policies, and help make clarify mistakes ahead of time~\cite{hallett_specifying_2016}.
-
-An AppPAL evaluation library has been developed that runs on Java and Android and is available online\footnote{\url{https://github.com/apppal/libapppal}}.
-As part of this work we have developed (in Section~\ref{sec:details}) a series of policy analysis tools for AppPAL.
-These are compiled alongside the main AppPAL interpreter and may be run from the command-line.
+% 2 pages
 
 \section{The Details}
-% 5 pages
 \label{sec:details}
-
-% - Show the standard predicates and explain how they help to give structure to apppal policies
-%   - show how they are tied into the trust relationships with patient care (i.e. consent)
-% - Show the consistency checker
-%   - Give algorithm and intuition
-%   - Show examples where it has found problems
-% - Show redundancy checks
-%   - Algorithm and intuition
-%   - Examples where problems were found
-
-\subsection{Policy Idioms}
-
-When translating the \ac{BYOD} policies we found types of actions or checks being performed.
-There are checks if things are of a particular type (for~example in the NHS policy rule~2.1  a staff member is elligable for a mobile device if they are lone-working, work out-of-hours and work out-of-office).  
-There are checks if an action is allowed (such~as whether they can connect to an wireless access point in the \ac{HiMSS} policy);  and checks to see if an action has already been performed (like the need to have acknowledged a policy in all three policies).
-We also find policy rules that state the user should perform an action (such as disabling phone functionality in the SANS policy, or an obligation to report a phone missing in the NHS policy).
-
-To help structure the formalisation we give the AppPAL predicates used to translate the policies prefixes.
-The prefixes help to clarify the meaning of each predicate and groups the predicates into four categories.
-
-\begin{tabular}{l l}
-  \toprule
-  Predicate & Meaning \\
-  \midrule
-  \textit{Subject} \texttt{can}\textit{Action}  & The \emph{subject} is allowed to perform the \emph{action}. \\
-  \textit{Subject} \texttt{has}\textit{Action}  & The \emph{subject} has performed the \emph{action}. \\
-  \textit{Subject} \texttt{is}\textit{Propery}  & The \emph{property} is true about the \emph{subject}. \\
-  \textit{Subject} \texttt{must}\textit{Action} & The \emph{subject} is obliged to perform the action. \\
-  \bottomrule \\
-\end{tabular}
-
-\subsubsection{Acknowledgements}
-
-A common idiom in each of the policies is requiring an acknowledgement from the device owner that a policy exists, or that the company may have certain rights.  
-These rules are interesting as there is often not a technical means to enforce them.
-For example both the NHS and HiMSS policies have rules stating that they cannot be held liable if a user loses personal information if their device needs to be erased to protect personal information.
-
-\begin{lstlisting}[title={\footnotesize\textbf{\ac{HiMSS}}:~\itshape 
-I agree to hold XYZ Health System harmless for any loss relating to the administration of PDA/Smartphone connectivity to XYZ Health System systems including, but not limited to, loss of personal information stored on a PDA/Smartphone due to data deletion done to protect sensitive information related to XYZ Health System, its patients, members or partners.}]
-'user' says 'user' hasAcknowledged('data-loss-policy').
-\end{lstlisting}
-
-\begin{lstlisting}[title={\footnotesize\textbf{NHS}:~\itshape 
-Individuals who have personal data of any kind stored on a corporately issued mobile device must be aware that in the event of loss of the device the above data wipe will include removal of all personal data.}]
-'nhs-trust' says Staff can-say
-	Staff hasAcknowledged('data-loss-policy') 
-	if Staff isStaff.
-\end{lstlisting}
-
-This idiom is particularly common in the \ac{HiMSS} policy where over the rules require some level of acknowledgement, and a third require an acknowledgement alone (\autoref{tab:idioms}).
-Similarly in the longer NHS policy almost a quarter of the rules require the subject to acknowledge a rule.
-In contrast the more technically focussed SANS policy has only one occurance of the idiom, when describing the other policies a user should be following in order to use a mobile device.
-
-\begin{lstlisting}[title={\footnotesize\textbf{SANS}:~\itshape 
-Users MUST agree to the email security/acceptable use policy and eventually to the eCommerce security policy.}]
-'company' says User canUse(Device) 
-  if User hasDevice(Device),
-     User hasAcknowledged('email-security'),
-     User hasAcknowledged('acceptable-use'), 
-     User hasAcknowledged('ecommerce-security').
-\end{lstlisting}
-
-The reliance in both the NHS and \ac{HiMSS} policies suggests that \ac{BYOD} policies often go beyond technical rules; something ignored in previous work on policy formalisation.
-These policies often require that employees \emph{follow the rules}, and have an awareness of the systems surrounding them;
-  something which cannot be checked by static analysis.
-
-\begin{table}\centering
-  \begin{tabular}{l c c c}
-    \toprule
-    Idiom                    & \ac{HiMSS} & NHS       & SANS      \\
-    \midrule
-    Acknowledgement          & 5 (33\%)   & 9 (18\%)  & 1 (3\%)   \\
-    Partial Acknowledgement  & 3 (20\%)   & 2 (4\%)   & 0         \\
-    Delegation               & 6 (40\%)   & 15 (30\%) & 14 (42\%) \\
-    \bottomrule             \\
-  \end{tabular}
-  \label{tab:idioms}
-  \caption{Occurences of policy idioms in each of the \ac{BYOD} policies.}
-\end{table}
-
-\subsection{Delegating Responsibility}
-
-When describing rules employees must follow, there are often aspects of the rules that require other employees and departments to sign off on.
-For example in the NHS policy for an employee to be able to use a \ac{BYOD} phone the finance director and relevant assistant director must both sign off on it.
-
-\begin{lstlisting}[title={\footnotesize\textbf{\ac{NHS}}:\itshape
-Upon receipt of the completed application form, allocation will need to be authorised by the relevant Assistant Director and the Director of Finance.}]
-'nhs-trust' says Form isAuthorised
-  if Staff hasAppliedForPhone(Form),
-     FD hasAuthorised(Form),
-     FD isFinanceDirector,
-     AD hasAuthorized(Form),
-     AD isAssistantDirector,
-     AD isManagerOf(Staff).
-
-
-'nhs-trust' says X can-say X hasAuthorised(Form)
-  if X isEmployee,
-     Form isForm.
-\end{lstlisting}
-
-These delegations start to show some of the different responsibilities of the different employees.
-Later in the NHS policy we find a rule that it is an employee's line manager's responsibility to sign off on the use of a paid app:
-
-\begin{lstlisting}[title={\footnotesize\textbf{NHS}:\itshape
-Use of paid apps must be agreed in advance with the device holder's line manager and their should be a demonstrable benefit.}]
-'nhs-trust' says Manager can-say
-  Staff canInstall(App)
-  if App isPaidApp,
-     Manager isManagerOf(Staff).
-\end{lstlisting}
-
-This highlights that the policy is incomplete: different managers may have different criteria for what constitutes an \emph{demonstrable benefit}.
-It is not the policy's job to state precisely for the manager what is beneficial or not, but rather to indicate that it is the manager's call.
-The manager could specify their requirements as a formal series of rules expressed in AppPAL and enforced by their favorite \ac{MDM} tool, or they could specify apps on a case by case basis for each employee that asks.
-
-These relationships are often ignored by existing BYOD policy tools, which focus on how a manager's policy could be implemented by restricting the functionality of the individual apps.  In this work we're more interested in who makes the decision and what decisions they make rather than the mechanism for enforcing their policies.  When modelling these policies it is necessary to use a formalism that supports delegation, such as AppPAL, to capture these requirements.
-
-Using AppPAL we model these kinds of decisions using delegation with the \emph{can-say} statement.
-All three policies contain some form of delegation relationships: in the \ac{HiMSS} policy it is the responsibility of the management to decide is a device must be wiped:
-\begin{lstlisting}[title={\footnotesize\textbf{\ac{HiMSS}}:\itshape
-I agree that the PDA/Smartphone can be wiped by XYZ Health System upon the decision of XYZ Health System management.}]
-'user' says 'xyz-health-system' can-say
-  Device mustBeErased
-  if 'user' hasDevice(Device).
-\end{lstlisting}
-In the SANS policy only the devices identified by the IT-Department can connect to internal networks and decide the access control policies:
-\begin{lstlisting}[title={\footnotesize\textbf{\ac{HiMSS}}:\itshape
-All devices, including handhelds that have to connect to internal networks MUST be identified by IT department}]
-'company' says Device canConnectTo(Network)
-  if Network isInternalNetwork,
-     Device isIdentified.
-
-'company' says 'it-department' can-say
-  Device isIdentified
-  if Device isDevice.
-\end{lstlisting}
-All three policies make extensive use of delegation patterns. 
-In the NHS policy acknowledgements are implemented by delegating to the user to make the statement, where as in the \ac{HiMSS} policy they are given as straight assertions as the \ac{HiMSS} policy is implemented from the view of the user. The SANS policy supposes your company has several different departments each with their own specialities (such as IT, security and desktop support personnel), each of which is delegated to for approriate decisions.
-
-\subsection{Checking Reachability}
-
-Inference in AppPAL happens by collecting ground facts and constraints that satisfy rules.
-These rules are then combined to form a policy. 
-If a rule is reachable then we would expect there to be some combination of facts that could satisfy the rule.
-If there are no facts that could satisfy the rule then this suggests that the policy may be incomplete as there are policy rules that can never be satisfied.  
-
-We search for reachable assertions using the algorithm in Listing~\ref{alg:reachable}:
-it produces a set of pairs of predicates and speakers where the a pair of a speaker and a predicate indicates that that speaker may say something about that predicate.
-We search over all the assertions in the AppPAL assertion context.
-If all of an assertion's conditionals (the facts in the if part) are reachable (or it has none) then the speaker and predicate are added to the reachable set.
-If the statement is a can-say statement then we additionally check if the delegated predicate is reachable from the delegated speaker, and if so mark the delegated statement as reachable from the speaker who made the can-say statement.
-
-\begin{lstlisting}[language=Python,float,caption={Procedure for finding all reachable assertions.},label={alg:reachable}]
-def reachable(ac) -> set:
-  reachable = new set()
-  iterate = True
-  while iterate == True:
-    iterate = False
-    for assertion in ac:
-      e = a.speaker
-      p = a.predicate
-      if p.isCanSay() and (e, p) in reachable:
-        if (p.delegator, p.delegation) in reachable:
-          if for all c in a.conditions: (e, c.predicate) in reachable:
-            reachable.add((e, p.delegation))
-            iterate = True
-      else if not (e, p) in reachable:
-        if for all c in a.conditions; (e, c.predicate) in reachable:
-          reachable.add((e, p))
-          iterate = True
-  return reachable
-\end{lstlisting}
-
-\subsection{Checking Redundancy}
-
-To check redundancy we convert the policy into a graph structure.
-Each statement we might want to prove (a goal) becomes a node in the graph, its children are organised into sets of goals (a proof), where if all the goals in any set were proved true then the goal node would also become true.
-If a node has an empty set of goals to prove it is a fact.
-Once the graph has been constructed (taking into account delegation and unification with other statements), the graph is flattened by applying the flatten procedure (Listing~\ref{alg:flatten}) repeatedly until a fixed point is reached.
-When the graph has been flattened we look for redundancy by looking for goals with proofs that are subsets of their other proofs, implying that if the larger proof is true, then the shorter proof will always be true too; 
-  and different goals with identical proofs, implying that the two decisions are not independent~(Listing~\ref{alg:redundancy}).
-
-\begin{lstlisting}[language=Python,float,caption={Procedure for flattening the redundancy graph.},label={alg:flatten}]
-def flatten(graph):
-  for goal in graph.goals:
-    hoist = true
-    for proof in graph[goal]:
-      for proof_goal in proof:
-        if not proof_goal.is_fact:
-          hoist = False
-          break
-    if hoist == True:
-      hoist(graph, goal)
-
-def hoist(graph, target):
-  for parent in graph[target].parents:
-    for proof in parent.proofs:
-      if proof.uses(target):
-        for replacements in graph[target].parents:
-          parent.proofs += proof.replace(target, replacements)
-        parent.proofs -= proof
-\end{lstlisting}
-
-\begin{lstlisting}[language=Python,float,caption={Procedure to check for redundancy.},label={alg:redundancy}]
-def check_redundancy(graph) -> boolean:
-  for goal in graph.goals:
-    for a in graph[goal]:
-      for b in graph[goal]:
-        if a >= b and a.goals.subset(b.goals):
-          if b.goals.subset(a.goals):
-            warn(a+" has multiple equivalent proofs") 
-          else
-            warn(a+" has a redundant proof")
-    for other_goal in graph.goals:
-      if goal > other_goal:
-        for a in graph[goal]:
-          for b in graph[other_goal]:
-            if not (a.goals.is_empty() or b.is_empty())
-               and a.goals == b.goals:
-              warn(a+" and "+b+" have equivalent proofs")
-\end{lstlisting}
+% 5 pages
 
 \section{Related Work}
-% 1-2 pages
 \label{sec:related}
-
-Armando~\etal~created a BYODroid~\cite{armando_bring_2013}; \ac{BYOD} framework
-to enforce \ac{BYOD} policies by extending Featherweight
-Java~\cite{igarashi_featherweight_2001} with a type system that can describe how
-Android apps interact. Whilst this work gives a framework for enforcing policies
-on Android, it doesn't help policy authors decide what the policies should be to
-begin with. They went on to show how BYODroid could be used to enforce a {NATO}
-Communications and Information Agency policy~\cite{armando_developing_2016}.
-Armando~\etal also proposed creating curated app stores based on corporate BYOD
-policies~\cite{armando_enabling_2014}. To do this they analysed a BYOD policy
-taken from the US Government BYOD Security
-Guidelines~\cite{digital_services_advisory_group_and_federal_chief_information_officers_council_bring_????}~and
-translated it into rules in the CONspec~\cite{aktug_conspec_2008} language which
-allows a low-level description of app behavior based on Java code. They then
-used these rules to filter apps for their store from a selection of 860 apps
-taken from the \emph{top selling free} section of the Google Play store.
-
-Martinelli~\etal~applied the UCON security model to describe \ac{BYOD} policies
-for Android~\cite{martinelli_enhancing_2016}. Using this model they created an
-enforcement framework that could alter the permissions granted to Android apps
-at run time. This framework requires a rooted device for most Android versions,
-however, they do claim it should work without modification on the latest
-version. Again like the work of Armando~\etal, this gives a framework for
-enforcement but without consideration of what the policies should be enforcing.
-
-Hong~\etal~focussedon the network aspects of a \ac{BYOD} policy with their
-PBS-Droid tool~\cite{sungmin_hong_towards_2016}.  PBS-Droid allowed BYOD policy
-authors the ability to sandbox individual apps into their own software-defined
-networks giving finer control over how individual apps interact with a companies
-networks and allowing for dynamic policy enforcement and network configuration.
-
-For more general mobile policies, there has been extensive work in both
-modeling and enforcing various policies.  Sadeh~\etal~surveyed users to find
-their privacy preferences and found four different types of user each with
-different privacy policies~\cite{sadeh_understanding_2009}.  Various tools have
-been proposed that can enforce app behavior policies.  Aurasium works by
-repackaging apps to use modified APIs~\cite{xu_aurasium:_2012}.  These APIs can
-enforce policies to protect a user's personal information or prevent sending
-premium rate text messages.  Another tool, CRePE~\cite{conti_crepe:_2010}
-modifies Android to provide a framework that can enforce policies based
-on the contextual information, such as the device's location or battery level.
-The SEAR tool takes a different approach and actively scans apps for
-vulnerabilities over collections of apps.  It then outputs security policies
-that users might want to enforce in order to prevent attacks from occurring in
-the first place~\cite{bagheri_practical_2016}.
+% 1-2 pages
 
 \section{Conclusions}
-% 0.5 pages
 \label{sec:conclusions}
+% 1/2 page
+
+
 
 \bibliography{paper}{}
 \bibliographystyle{plain}
