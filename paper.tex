@@ -1,9 +1,15 @@
 \documentclass{article}
 
 \usepackage{microtype}
+\usepackage{amsmath,amssymb,mathtools}
 
 \usepackage{acronym}
 \acrodef{MDM}{Mobile Device Management}
+
+\usepackage{listings}
+
+\usepackage{framed}
+\newcommand{\todo}[1]{\marginpar{\begin{framed}\footnotesize\sffamily\raggedright #1\end{framed}}}
 
 \title{Capturing Policies for BYOD}
 \author{Joseph Hallett and David Aspinall}
@@ -47,6 +53,9 @@ Using our formalization we identify the common concerns and trust relationships 
 We show how AppPAL can be used to implement these policies, and describe precisely the different trust relationships.
 AppPAL is an instantiation of the SecPAL authorization language~\cite{becker_secpal:_2010} for mobile device policies.
 We have found, however, that it is a good fit for other policies surround the mobile ecosystem as well~\cite{hallett_specifying_2016}.
+Using these papers we identify a set of standard decisions and trust relationships used in BYOD policies.
+These are BYOD idioms that are capture decisions at common requirements in BYOD policies.
+These give a guide for where future work implementing BYOD tools should focus their efforts to cover more aspects of policies.
 
 \section{My Idea}
 \label{sec:idea}
@@ -57,19 +66,78 @@ Part of their policies are prescriptive:  if you configure your device in this w
 The policies contain more than just configuration, however.
 Consider this rule taken from the \emph{Security Policy for the use of handheld devices in corporate environments} by SANS~\cite{nicholas_r._c._guerin_security_2008}:
 
+\newcommand{\textbra}[1]{\ensuremath{\left\langle \text{\sffamily #1} \right\rangle}}
 \begin{quote}
-  Digital camera embedded on handheld devices \emph{might} be disabled in restricted environments, according to $\langle$COMPANY NAME$\rangle$ risk analysis. 
+  Digital camera embedded on handheld devices \emph{might} be disabled in restricted environments, according to \textbra{COMPANY NAME} risk analysis. 
   In sensitive facilities, information can be stolen using pictures and possibly sent using MMS or E-mail services.
 
-  In high-security facilities such as R&D labs or design manufacturers, camera MUST be disabled.
+  In high-security facilities such as R\&D labs or design manufacturers, camera MUST be disabled.
   Furthermore, MMS messages should be disabled as well, to prevent malicious users from sending proprietary pictures.
 \end{quote}
 
+To implement this policy an \ac{MDM} program, such as IBM's MaaS360 could be used~\cite{_ibm_????}.
+This software supports app wrapping (where an app is recompiled to use guarded APIs), and supports security ``checkboxes'' to enable security controls and access control policies.
+Using techniques like this would implement the recommendation within the rule, but the rule itself contains more than just configuration to implement.  
+It talks of \emph{restricted environments} decided by \emph{company risk analysis}; but how is this communicated to the device?
+Does it access the list of restricted environments once, from a server?
+Does it understand how the risk analysis was performed?  
+Can it decide on the basis of a policy if a location is restricted?
+The rule also gives a security objective: \emph{prevent malicious users from sending proprietary pictures}.
+The guidelines are given, however, for the specific cases of a compliant user using MMS or email.
+This may not be sufficient to stop a sufficiently motivated \emph{malicious} user.
 
+Our approach does not try to implement the policy.
+Rather we attempt to capture the goals of the policy rule so that the delegations of trust, tools used, and their configuration is made explicit.
+This gives us greater clarity as to which tool is being trusted to implement what policy.
+It allows us to see who is being trusted to make which decisions.
+It also lets us use automatic tools to uncover aspects of the policy that may be unimplemented~\cite{hallett_specifying_2016}.
+Continuing with the example above, this can be expressed in AppPAL as:
+
+\begin{lstlisting}
+'company' says 'risk-analysis' can-say 
+  Location:L isHighSecurityFacility.
+
+'company' says Device:D mustDisableIn(Location, 'camera')
+  if Location isHighSecurityFacility.
+
+'company' says Device:D mustDisableIn(Location, 'mms') 
+  if Location isHighSecurityFacility.
+
+'company' says User:U hasSatisfied('proprietary pictures policy')
+  if U hasDevice(D),
+     D mustDisableIn(Location, 'camera'),
+     D mustDisableIn(Location, 'mms'),
+     Location isHighSecurityFacility.
+\end{lstlisting}
+
+\todo{%
+  Why is the apppal better?
+  Clearer, explicit, can identify problems automatically.
+  
+  Explain why I'm trying to build a schema for byod policies and why this is worth a paper.
+  
+  How is this falsifiable?
+  Examples of policy idioms we can't express.
+}
 
 \section{The Details}
 \label{sec:details}
 % 5 pages
+
+\subsection{BYOD Policies}
+Policies were taken from 5 sources:
+\begin{itemize}
+  \item SANS
+  \item NHS
+  \item HiMMS
+  \item Edinburgh
+  \item Code3SPE
+\end{itemize}
+\todo{Describe differences and similaritites at a high level between these policies.}
+
+\subsection{BYOD Idioms}
+\todo{Describe common idioms and patterns found in each of the policies.  Check the earlier draft for some starting work}
+
 
 \section{Related Work}
 \label{sec:related}

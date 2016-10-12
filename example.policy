@@ -1,0 +1,14 @@
+'company' says 'risk-analysis' can-say 
+  Location:L isHighSecurityFacility.
+
+'company' says Device:D mustDisableIn(Location, 'camera')
+  if Location isHighSecurityFacility.
+
+'company' says Device:D mustDisableIn(Location, 'mms') 
+  if Location isHighSecurityFacility.
+
+'company' says User:U hasSatisfied('proprietary pictures policy')
+  if U hasDevice(D),
+     D mustDisableIn(Location, 'camera'),
+     D mustDisableIn(Location, 'mms'),
+     Location isHighSecurityFacility.
