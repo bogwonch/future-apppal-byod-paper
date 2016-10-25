@@ -74,7 +74,7 @@ These policies take the form of user agreements, written in natural language, wh
 Various guides are available for companies wishing to implement a policy from governments, standards bodies, and companies seeking to advise~\cite{nicholas_r._c._guerin_security_2008,souppaya_guidelines_????,hp_byod_????,cesg_byod_2015}.
 On top of user agreements companies may also use \ac{MDM} software, which can enforce some policies automatically.
 The use of \ac{MDM} software does not guarantee compliance however.
-One survey found over 50\% of companies with \ac{MDM} software still have uncompliant devices in their networks~\cite{mobileiron_security_labs_q4_2015}.
+One survey found over 50\% of companies with \ac{MDM} software still have un-compliant devices in their networks~\cite{mobileiron_security_labs_q4_2015}.
 
 BYOD policies are becoming more complex and \ac{MDM} software is becoming more proficient.
 There has been much work looking at developing the \ac{MDM} software to enforce aspects of BYOD policies~\cite{costantino_towards_2013,martinelli_enhancing_2016,armando_enabling_2014}.
@@ -147,10 +147,10 @@ Continuing with the example above, this can be expressed in AppPAL as:
 \end{lstlisting}
 
 \todo{%
-  Why is the apppal better?
+  Why is the AppPAL better?
   Clearer, explicit, can identify problems automatically.
 
-  Explain why I'm trying to build a schema for byod policies and why this is worth a paper.
+  Explain why I'm trying to build a schema for BYOD policies and why this is worth a paper.
 
   How is this falsifiable?
   Examples of policy idioms we can't express.
@@ -222,7 +222,7 @@ The second is taken from Healthcare Information Management System Society~\cite{
 It is relatively short but interesting because it contains concerns specific to healthcare scenarios, and is written as a contract the users are agreeing to follow.
 In contrast every other policy we looked at is written as a series of rules users should follow to ensure compliance.
 The policy is designed as a sample agreement for a system trying to manage personal mobile devices in a healthcare environment.
-The third is taken from an british hospital trust~\cite{kennington_mobiles_2014}, and describes the BYOD scheme used in practice at the hospital.
+The third is taken from an British hospital trust~\cite{kennington_mobiles_2014}, and describes the BYOD scheme used in practice at the hospital.
 Finally two simpler policies are taken from Edinburgh university~\cite{david_williamson_bring_2015} and a company specialising in emergency sirens~\cite{code3pse.org_sample_????}.
 These policies are simpler than the other comprised of much more general rules and only a page or two in length.
 
@@ -256,7 +256,7 @@ For example rule 9.1 in the NHS policy states:
   All staff are reminded that they must adhere to the guidance outlined in the Social Media Policy.
 \end{policyrule}
 The rule does not prohibit any action, and doesn't require the staff to do anything different.
-It does remind staff to be aware of a rule which we could implement with an acknowledegement; a statement that the party has acknowledged a rule.
+It does remind staff to be aware of a rule which we could implement with an acknowledgement; a statement that the party has acknowledged a rule.
 \begin{lstlisting}
 'nhs-trust' says Staff:S mustAcknowledge('avoid-installing-personal-apps').
 'nhs-trust' says Staff:S mustAcknowledge('social-media-policy').
@@ -284,7 +284,7 @@ For example, in the SANS policy the IT-Department are responsible for deciding w
   \end{lstlisting}
 \end{policyrule}
 The NHS policy, however, is significantly more complicated.
-Apps have to be approved by three different groups (the Integrated Governance Comitee, the Employee's manager, and the relevant group within the trust depending on where the employee works) before the trust will say that an app can be installed.
+Apps have to be approved by three different groups (the Integrated Governance Committee, the Employee's manager, and the relevant group within the trust depending on where the employee works) before the trust will say that an app can be installed.
 \begin{policyrule}{NHS}
   Apps for work usage must not be downloaded onto corporately issued
   mobile devices (even if approved on the NHS apps store) unless they have
@@ -328,7 +328,7 @@ Apps have to be approved by three different groups (the Integrated Governance Co
   if Manager isResponsibleFor(Device).
   \end{lstlisting}
 \end{policyrule}
-Given that user's have privacy preferences expressable as permissions~\cite{lin_modeling_2014}, we might expect corporate policies to also express preferences about what permissions an app can have.
+Given that user's have privacy preferences expressible as permissions~\cite{lin_modeling_2014}, we might expect corporate policies to also express preferences about what permissions an app can have.
 This does not appear to be the case, however. 
 As part of selecting the apps an IT department or group may chose to use advanced instrumentation and policies~\cite{armando_enabling_2014}, or they may manually chose apps to form a curated app store as some \ac{MDM} vendors allow.
 But from the perspective of the policy itself it is more important \emph{who} makes the decision rather than \emph{what} they chose, if they have an opinion at all.
@@ -350,7 +350,7 @@ But from the perspective of the policy itself it is more important \emph{who} ma
     Device \texttt{canConnectToNetwork}(Subnet) & \cmark                 &                         &                     &                   & \cmark
     & Says the device may connect to a network, for example computers all within a subnet. \\
     Device \texttt{canConnectToServer}(IP)      &                        &                         &                     & \cmark            & \cmark
-    & Says the subject (a device) can connect to a given server (identitfied by a URL).    \\
+    & Says the subject (a device) can connect to a given server (identified by a URL).    \\
     Device \texttt{canInstall}(App)             &                        &                         &                     & \cmark            & \cmark
     & Says the device may install an app.                                                  \\
     User \texttt{canMonitor}(Device)            & \cmark                 &                         &                     & \cmark            & \cmark
@@ -360,7 +360,7 @@ But from the perspective of the policy itself it is more important \emph{who} ma
     User \texttt{canUse}(Device)                &                        &                         &                     & \cmark            & \cmark
     & Says a user may use a device.                                                        \\
     User \texttt{hasAcknowledged}(Policy)       & \cmark                 & \cmark                  & \cmark              & \cmark            & \cmark
-    & Says an individual has acknoweldged a policy.                                        \\
+    & Says an individual has acknowledged a policy.                                        \\
     Device \texttt{hasFeature}(Feature)         &                        & \cmark                  &                     & \cmark            &
     & Says a device has a feature enabled.                                                 \\
     Something \texttt{hasMet}(Policy)           &                        & \cmark                  &                     & \cmark            & \cmark
