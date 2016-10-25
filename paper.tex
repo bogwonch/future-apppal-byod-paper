@@ -5,6 +5,10 @@
 \usepackage{hyperref}
 \usepackage{booktabs}
 
+\usepackage{pifont}
+\newcommand{\cmark}{\ding{51}}%
+\newcommand{\xmark}{\ding{55}}%
+
 \usepackage{acronym}
 \acrodef{MDM}{Mobile Device Management}
 
@@ -37,9 +41,9 @@
 \newcommand{\todo}[1]{\marginpar{\begin{framed}\footnotesize\sffamily\raggedright #1\end{framed}}}
 
 \newenvironment{policyrule}[1]{%
-  \begin{framed}
-      \noindent\textbf{\sffamily #1}:~\itshape
-}{
+  \begin{framed}\footnotesize
+      \noindent\textbf{\sffamily #1}:~\itshape%
+}{%
   \end{framed}
 }
 
@@ -58,10 +62,10 @@
 % State my contribution
 % 1 page
 
-Employees bring their own devices to work.  
-In the past employees might have had a dedicated company device. 
+Employees bring their own devices to work.
+In the past employees might have had a dedicated company device.
 Today around 70\% of companies have a BYOD scheme~\cite{schulze_byod_2016} and, in some fields,
-  85\% of staff use their personal devices to look up work-sensitive information~\cite{patel_uk_2015}. 
+  85\% of staff use their personal devices to look up work-sensitive information~\cite{patel_uk_2015}.
 This creates a challenge for IT departments.
 They need to control access to company resources, but have limited control over the devices used to access them.
 
@@ -100,7 +104,7 @@ Consider this rule taken from the \emph{Security Policy for the use of handheld 
 
 \newcommand{\textbra}[1]{\ensuremath{\left\langle \text{\sffamily #1} \right\rangle}}
 \begin{quote}
-  Digital camera embedded on handheld devices \emph{might} be disabled in restricted environments, according to \textbra{COMPANY NAME} risk analysis. 
+  Digital camera embedded on handheld devices \emph{might} be disabled in restricted environments, according to \textbra{COMPANY NAME} risk analysis.
   In sensitive facilities, information can be stolen using pictures and possibly sent using MMS or E-mail services.
 
   In high-security facilities such as R\&D labs or design manufacturers, camera MUST be disabled.
@@ -109,10 +113,10 @@ Consider this rule taken from the \emph{Security Policy for the use of handheld 
 
 To implement this policy an \ac{MDM} program, such as IBM's MaaS360 could be used~\cite{_ibm_????}.
 This software supports app wrapping (where an app is recompiled to use guarded APIs), and supports security ``checkboxes'' to enable security controls and access control policies.
-Using techniques like this would implement the recommendation within the rule, but the rule itself contains more than just configuration to implement.  
+Using techniques like this would implement the recommendation within the rule, but the rule itself contains more than just configuration to implement.
 It talks of \emph{restricted environments} decided by \emph{company risk analysis}; but how is this communicated to the device?
 Does it access the list of restricted environments once, from a server?
-Does it understand how the risk analysis was performed?  
+Does it understand how the risk analysis was performed?
 Can it decide on the basis of a policy if a location is restricted?
 The rule also gives a security objective: \emph{prevent malicious users from sending proprietary pictures}.
 The guidelines are given, however, for the specific cases of a compliant user using MMS or email.
@@ -126,13 +130,13 @@ It also lets us use automatic tools to uncover aspects of the policy that may be
 Continuing with the example above, this can be expressed in AppPAL as:
 
 \begin{lstlisting}
-'company' says 'risk-analysis' can-say 
+'company' says 'risk-analysis' can-say
   Location:L isHighSecurityFacility.
 
 'company' says Device:D mustDisableIn(Location, 'camera')
   if Location isHighSecurityFacility.
 
-'company' says Device:D mustDisableIn(Location, 'mms') 
+'company' says Device:D mustDisableIn(Location, 'mms')
   if Location isHighSecurityFacility.
 
 'company' says User:U hasSatisfied('proprietary pictures policy')
@@ -145,9 +149,9 @@ Continuing with the example above, this can be expressed in AppPAL as:
 \todo{%
   Why is the apppal better?
   Clearer, explicit, can identify problems automatically.
-  
+
   Explain why I'm trying to build a schema for byod policies and why this is worth a paper.
-  
+
   How is this falsifiable?
   Examples of policy idioms we can't express.
 }
@@ -210,16 +214,16 @@ The rule can be re-written as shown bellow hiding the typing statements.
 
 We analysed five different policies to find common idioms.
 The first is the \emph{Security Policy Template: Use of Handheld Devices in a Corporate Environment}, published by the SANS Institute~\cite{nicholas_r._c._guerin_security_2008}.
-This is a hypothetical policy published to help companies mitigate the threats to corporate assets caused by mobile devices. 
-Companies are expected to modify the document to suit their needs.  
+This is a hypothetical policy published to help companies mitigate the threats to corporate assets caused by mobile devices.
+Companies are expected to modify the document to suit their needs.
 The policy is general; not specific to any particular industry, device, or country's legislation.
-The second is taken from Healthcare Information Management System Society~\cite{healthcare_information_and_management_systems_society_mobile_2012}; 
-  a US non-profit company trying to improve healthcare through IT.  
-It is relatively short but interesting because it contains concerns specific to healthcare scenarios, and is written as a contract the users are agreeing to follow. 
+The second is taken from Healthcare Information Management System Society~\cite{healthcare_information_and_management_systems_society_mobile_2012};
+  a US non-profit company trying to improve healthcare through IT.
+It is relatively short but interesting because it contains concerns specific to healthcare scenarios, and is written as a contract the users are agreeing to follow.
 In contrast every other policy we looked at is written as a series of rules users should follow to ensure compliance.
 The policy is designed as a sample agreement for a system trying to manage personal mobile devices in a healthcare environment.
-The third is taken from an british hospital trust~\cite{kennington_mobiles_2014}, and describes the BYOD scheme used in practice at the hospital. 
-Finally two simpler policies are taken from Edinburgh university~\cite{david_williamson_bring_2015} and a company specialising in emergency sirens~\cite{code3pse.org_sample_????}. 
+The third is taken from an british hospital trust~\cite{kennington_mobiles_2014}, and describes the BYOD scheme used in practice at the hospital.
+Finally two simpler policies are taken from Edinburgh university~\cite{david_williamson_bring_2015} and a company specialising in emergency sirens~\cite{code3pse.org_sample_????}.
 These policies are simpler than the other comprised of much more general rules and only a page or two in length.
 
 \begin{table}\centering\footnotesize\sffamily
@@ -243,10 +247,11 @@ These policies are simpler than the other comprised of much more general rules a
 The policies are summarised in \autoref{tab:summary}.
 Each policy contains a series of \emph{rules}, which are implemented by one or more \emph{AppPAL assertions}.
 The \emph{policy coverage} represents the number of rules that have an AppPAL description attached.
+
 Not all the rules in a policy require an AppPAL translation.
 For example rule 9.1 in the NHS policy states:
 \begin{policyrule}{NHS}
-  Downloading of personal apps onto a corporately issued mobile device should be avoided where possible. 
+  Downloading of personal apps onto a corporately issued mobile device should be avoided where possible.
   The Trust would not encourage staff members to download apps for personal use onto a corporately issued mobile device.
   All staff are reminded that they must adhere to the guidance outlined in the Social Media Policy.
 \end{policyrule}
@@ -257,6 +262,149 @@ It does remind staff to be aware of a rule which we could implement with an ackn
 'nhs-trust' says Staff:S mustAcknowledge('social-media-policy').
 \end{lstlisting}
 In this case, however, since nothing is required even an acknowledgement seems excessive.
+
+Table~\ref{tab:byod-predicates} summarises the facts used by multiple policies.
+This shows what concerns and controls and are shared between different BYOD policies.
+All five of the policies make use of acknowledgements, for example.
+This could be because not all the rules in a policy can be enforced through technical means, 
+  or it could indicate policy authors care more that the subjects are aware of the rules than they do for rigorous enforcement.
+All but the HiMMS policy have rules that include locking down a device by disabling features.
+All but the Edinburgh policy have rules that look at what should happen when a device is lost,
+  and have rules that require employees inform someone when something happens.
+These common concerns suggest where future \ac{MDM} software should focus their efforts.
+
+Only the NHS and SANS, the two most complex policies, describe when a device can install an app and what kinds of apps are installable.
+In both policies this is predominantly limited to a delegation to the appropriate groups to authorize an app.
+For example, in the SANS policy the IT-Department are responsible for deciding what apps can be installed.
+\begin{policyrule}{SANS}
+  The IT Department maintains lists of allowed and unauthorized applications and makes them available to users on the intranet.
+  \normalfont
+  \begin{lstlisting}
+'company' says 'it-department' can-say App:A isInstallable.
+  \end{lstlisting}
+\end{policyrule}
+The NHS policy, however, is significantly more complicated.
+Apps have to be approved by three different groups (the Integrated Governance Comitee, the Employee's manager, and the relevant group within the trust depending on where the employee works) before the trust will say that an app can be installed.
+\begin{policyrule}{NHS}
+  Apps for work usage must not be downloaded onto corporately issued
+  mobile devices (even if approved on the NHS apps store) unless they have
+  been approved through the following Trust channels:
+  
+  Clinical apps; at the time of writing there are no apps clinically
+  approved by the Trust for use with patients~/~clients. However, if a
+  member of staff believes that there are clinical apps or other
+  technologies that could benefit their patients~/~clients, this should be
+  discussed with the clinical lead in the first instance and ratification
+  should be sought via the Care and Clinical Policies Group. A clinical
+  app should not be used if it has not been approved via this group.
+  
+  Business apps; at the time of writing there are no business (i.e.,
+  non-clinical) apps approved by the Trust for use other than those
+  preloaded onto the device at the point of issue. However, if a member of
+  staff believes that there are apps or other technologies that could
+  benefit their non-clinical work, ratification of the app must be sought
+  via the Management of Information Group (MIG). An app should not be used
+  if it has not been approved via this group.
+
+  Following approval through Care and Clinical Policies and~/~or MIG, final
+  approval will be required through Integrated Governance Committee.
+
+  Use of paid apps must be agreed in advance with the device holder's line
+  manager and there should be a demonstrable benefit.
+  \normalfont
+  \begin{lstlisting}
+'nhs-trust' says App isInstallable if App hasMet('clinical-use-case').
+'nhs-trust' says App isInstallable if App hasMet('business-use-case').
+'nhs-trust' says 'cacpg' can-say App:A hasMet('clinical-use-case').
+'nhs-trust' says 'mig' can-say App:A hasMet('business-use-case').
+'nhs-trust' says App isInstallable
+  if App hasMet('final-app-approval').
+'nhs-trust' says 'igc' can-say App hasMet('final-app-approval').
+'nhs-trust' says Device canInstall(App)
+  if App isInstallable,
+     App isApprovedFor(Device).
+'nhs-trust' says Employee:Manager can-say
+  App:A isApprovedFor(Device)
+  if Manager isResponsibleFor(Device).
+  \end{lstlisting}
+\end{policyrule}
+Given that user's have privacy preferences expressable as permissions~\cite{lin_modeling_2014}, we might expect corporate policies to also express preferences about what permissions an app can have.
+This does not appear to be the case, however. 
+As part of selecting the apps an IT department or group may chose to use advanced instrumentation and policies~\cite{armando_enabling_2014}, or they may manually chose apps to form a curated app store as some \ac{MDM} vendors allow.
+But from the perspective of the policy itself it is more important \emph{who} makes the decision rather than \emph{what} they chose, if they have an opinion at all.
+
+\begin{table}\centering\footnotesize
+  \newcommand{\angledtitle}[1]{\rlap{\rotatebox{30}{#1}}}
+  \sffamily
+  \begin{tabular}{l c c c c c p{0.45\linewidth} }
+    \toprule
+    Predicate                                   & \angledtitle{Sirens}   & \angledtitle{Edinburgh} & \angledtitle{HiMMS} & \angledtitle{NHS} & \angledtitle{SANS}
+    & Description                                                                          \\
+    \midrule
+    Device \texttt{canBackupTo}(Server)         &                        & \cmark                  & \cmark              &                   &
+    & Says the device may send backups to a server.                                        \\
+    Device \texttt{canCall}(Number)             &                        &                         &                     & \cmark            & \cmark
+    & Says the telephone numbers a device can call.                                        \\
+    Device \texttt{canConnectToAP}(AP)          &                        &                         & \cmark              &                   & \cmark
+    & Says a device may associate with an access point.                                    \\
+    Device \texttt{canConnectToNetwork}(Subnet) & \cmark                 &                         &                     &                   & \cmark
+    & Says the device may connect to a network, for example computers all within a subnet. \\
+    Device \texttt{canConnectToServer}(IP)      &                        &                         &                     & \cmark            & \cmark
+    & Says the subject (a device) can connect to a given server (identitfied by a URL).    \\
+    Device \texttt{canInstall}(App)             &                        &                         &                     & \cmark            & \cmark
+    & Says the device may install an app.                                                  \\
+    User \texttt{canMonitor}(Device)            & \cmark                 &                         &                     & \cmark            & \cmark
+    & Says the subject (a user) can monitor and unlock a device.                           \\
+    Device \texttt{canStore}(File)              &                        &                         & \cmark              &                   & \cmark
+    & Says a device may store some data in permanent (non-transient) storage.              \\
+    User \texttt{canUse}(Device)                &                        &                         &                     & \cmark            & \cmark
+    & Says a user may use a device.                                                        \\
+    User \texttt{hasAcknowledged}(Policy)       & \cmark                 & \cmark                  & \cmark              & \cmark            & \cmark
+    & Says an individual has acknoweldged a policy.                                        \\
+    Device \texttt{hasFeature}(Feature)         &                        & \cmark                  &                     & \cmark            &
+    & Says a device has a feature enabled.                                                 \\
+    Something \texttt{hasMet}(Policy)           &                        & \cmark                  &                     & \cmark            & \cmark
+    & Says a something has met a given set of requirements.                                \\
+    Device \texttt{isActivated}                 &                        &                         & \cmark              & \cmark            & \cmark
+    & Specifies a device has been activated for BYOD usage.                                \\
+    App \texttt{isApp}                          & \cmark                 &                         & \cmark              & \cmark            & \cmark
+    & Specifies an app.                                                                    \\
+    Something \texttt{isApproved}               &                        &                         & \cmark              &                   & \cmark
+    & Specifies that something has been vetted and approved of.                            \\
+    Data \texttt{isData}                        & \cmark                 &                         &                     &                   & \cmark
+    & Specifies data.                                                                      \\
+    Device \texttt{isDevice}                    & \cmark                 & \cmark                  & \cmark              & \cmark            & \cmark
+    & Specifies a device.                                                                  \\
+    User \texttt{isEmployee}                    & \cmark                 & \cmark                  &                     & \cmark            & \cmark
+    & Specifies that someone is an employee.                                               \\
+    Device \texttt{isEncrypted}                 &                        & \cmark                  &                     & \cmark            & \cmark
+    & Specifies a device is encrypted.                                                     \\
+    Feature \texttt{isFeature}                  & \cmark                 &                         &                     &                   & \cmark
+    & Specifies a feature.                                                                 \\
+    App \texttt{isInstallable}                  &                        &                         &                     & \cmark            & \cmark
+    & Specifies an app is installable.                                                     \\
+    Device \texttt{isLost}                      & \cmark                 &                         & \cmark              & \cmark            & \cmark
+    & Specifies a device is missing.                                                       \\
+    Device \texttt{isOwnedBy}(User)             & \cmark                 & \cmark                  & \cmark              & \cmark            & \cmark
+    & Specifies something's owner.                                                         \\
+    File \texttt{isSecurityLevel}(Level)        &                        &                         & \cmark              &                   & \cmark
+    & Specifies some data as having business sensitive information.                        \\
+    Something \texttt{isString}                 & \cmark                 &                         &                     & \cmark            &
+    & Specifies a string.                                                                  \\
+    Number \texttt{isTelephoneNumber}           &                        &                         &                     & \cmark            & \cmark
+    & Specifies a telephone number.                                                        \\
+    Device \texttt{mustDisable}(Feature)        & \cmark                 & \cmark                  &                     & \cmark            & \cmark
+    & Forces the disablement of a feature (or a device).                                   \\
+    User \texttt{mustInform}(User, Something)   & \cmark                 &                         & \cmark              & \cmark            & \cmark
+    & Forces someone to disclose something to someone.                                     \\
+    Device \texttt{mustWipe}                    & \cmark                 &                         & \cmark              & \cmark            &
+    & Forces a device to be erased.                                                        \\
+    \bottomrule
+  \end{tabular}
+  \caption{Summary of AppPAL facts used in multiple BYOD policies.}
+  \label{tab:byod-predicates}
+\end{table}
+
 
 \subsection{BYOD Idioms}
 \todo{Describe common idioms and patterns found in each of the policies.  Check the earlier draft for some starting work}
