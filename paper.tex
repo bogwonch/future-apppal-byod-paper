@@ -2,6 +2,8 @@
 
 \usepackage{microtype}
 \usepackage{amsmath,amssymb,mathtools}
+\usepackage{hyperref}
+\usepackage{booktabs}
 
 \usepackage{acronym}
 \acrodef{MDM}{Mobile Device Management}
@@ -23,6 +25,7 @@
   tabsize=2,
   showstringspaces=true,
   %numbers=left,
+  frame=single,
   breaklines=true,
   numberstyle=\tiny\ttfamily\color{Gray},
   commentstyle=\ttfamily\color{Gray}
@@ -31,6 +34,13 @@
 
 \usepackage{framed}
 \newcommand{\todo}[1]{\marginpar{\begin{framed}\footnotesize\sffamily\raggedright #1\end{framed}}}
+
+\newenvironment{policyrule}[1]{%
+  \begin{framed}
+      \noindent\textbf{\sffamily #1}:~\itshape
+}{
+  \end{framed}
+}
 
 \title{Capturing Policies for BYOD}
 \author{Joseph Hallett and David Aspinall}
@@ -145,30 +155,70 @@ Continuing with the example above, this can be expressed in AppPAL as:
 \label{sec:details}
 % 5 pages
 
+\subsection{Changes to AppPAL}
+
+We have used AppPAL to formalise the BYOD policies.
+AppPAL is an instantiation of Becker's SecPAL~\cite{becker_secpal:_2010} we have previously used to describe app privacy preferences~\cite{hallett_apppal_2016}.
+To describe BYOD policies we have extended AppPAL with types.
+This allows our policies to be more succinct and readable whilst losing none of the expressive power.
+When describing variables in the head of an AppPAL assertion.
+
+
 \subsection{BYOD Policies}
 
 We analysed five different policies to find common idioms.
 The first is the \emph{Security Policy Template: Use of Handheld Devices in a Corporate Environment}, published by the SANS Institute~\cite{nicholas_r._c._guerin_security_2008}.
 This is a hypothetical policy published to help companies mitigate the threats to corporate assets caused by mobile devices. 
-Companies are expected to modify the document to suit their needs.  The policy is general; not specific to any particular industry, device, or country's legislation.
-The second is taken from Healthcare Information Management System Society~\cite{healthcare_information_and_management_systems_society_mobile_2012}; a US non-profit company trying to improve healthcare through IT.  
+Companies are expected to modify the document to suit their needs.  
+The policy is general; not specific to any particular industry, device, or country's legislation.
+The second is taken from Healthcare Information Management System Society~\cite{healthcare_information_and_management_systems_society_mobile_2012}; 
+  a US non-profit company trying to improve healthcare through IT.  
+It is relatively short but interesting because it contains concerns specific to healthcare scenarios, and is written as a contract the users are agreeing to follow. 
+In contrast every other policy we looked at is written as a series of rules users should follow to ensure compliance.
 The policy is designed as a sample agreement for a system trying to manage personal mobile devices in a healthcare environment.
 The third is taken from an british hospital trust~\cite{kennington_mobiles_2014}, and describes the BYOD scheme used in practice at the hospital. 
 Finally two simpler policies are taken from Edinburgh university~\cite{david_williamson_bring_2015} and a company specialising in emergency sirens~\cite{code3pse.org_sample_????}. 
 These policies are simpler than the other comprised of much more general rules and only a page or two in length.
 
+\begin{table}\centering\footnotesize\sffamily
+  \begin{tabular}{l c c c c c}
+    \toprule
+                             & {SANS}       & {HiMSS}     & {NHS}       & {Edinburgh} & {Sirens}    \\
+    \midrule
+    Number of rules          & 33           & 15          & 56          &             & 25          \\
+    SecPAL assertions        & 71           & 21          & 58          & 10          & 39          \\
+    Policy coverage          & 33 (100$\%$) & 14 (93$\%$) & 40 (71$\%$) &             & 22 (88$\%$) \\
+    \midrule
+    Delegations              & 23           & 5           & 33          & 2           & 13          \\
+    Acknowledgement          &              &             &             &             &             \\
+    Partial Acknowledgement  &              &             &             &             &             \\
+    \bottomrule             \\
+  \end{tabular}
+  \label{tab:summary}
+  \caption{Summary of the contents of each of the BYOD policies.}
+\end{table}
 
-\begin{itemize}
-  \item SANS
-  \item NHS
-  \item HiMMS
-  \item Edinburgh
-  \item Code3SPE
-\end{itemize}
-\todo{Describe differences and similaritites at a high level between these policies.}
+The policies are summarised in \autoref{tab:summary}.
+Each policy contains a series of \emph{rules}, which are implemented by one or more \emph{AppPAL assertions}.
+The \emph{policy coverage} represents the number of rules that have an AppPAL description attached.
+Not all the rules in a policy require an AppPAL translation.
+For example rule 9.1 in the NHS policy states:
+\begin{policyrule}{NHS}
+  Downloading of personal apps onto a corporately issued mobile device should be avoided where possible. 
+  The Trust would not encourage staff members to download apps for personal use onto a corporately issued mobile device.
+  All staff are reminded that they must adhere to the guidance outlined in the Social Media Policy.
+\end{policyrule}
+The rule does not prohibit any action, and doesn't require the staff to do anything different.
+It does remind staff to be aware of a rule which we could implement with an acknowledegement; a statement that the party has acknowledged a rule.
+\begin{lstlisting}
+'nhs-trust' says Staff:S mustAcknowledge('avoid-installing-personal-apps').
+'nhs-trust' says Staff:S mustAcknowledge('social-media-policy').
+\end{lstlisting}
+In this case, however, since nothing is required even an acknowledgement seems excessive.
 
 \subsection{BYOD Idioms}
 \todo{Describe common idioms and patterns found in each of the policies.  Check the earlier draft for some starting work}
+
 
 
 \section{Related Work}
