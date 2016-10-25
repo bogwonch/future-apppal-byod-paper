@@ -16,10 +16,11 @@
   morestring=[b]',
   literate={\ inf\ }{{$\infty$}}5
 }[keywords,strings]
+\newcommand{\listingsize}[0]{\footnotesize}
 \lstset{%
-  basicstyle=\ttfamily,
-  keywordstyle=\ttfamily\slshape,
-  stringstyle=\sffamily,
+  basicstyle=\ttfamily\listingsize,
+  keywordstyle=\ttfamily\slshape\listingsize,
+  stringstyle=\sffamily\listingsize,
   columns=flexible,
   mathescape,
   tabsize=2,
@@ -157,7 +158,36 @@ Continuing with the example above, this can be expressed in AppPAL as:
 
 \subsection{Changes to AppPAL}
 
-When using AppPAL to describe policies, we need to describe what domain each variable belongs to.
+In order to describe BYOD specific conditions we instantiate AppPAL with four kinds of facts: \emph{can, has, is} and \emph{must}.
+Like other SecPAL-based instantiations~\cite{becker_framework_2009,aziz_secpal4dsa:_2011} we extend the syntax of facts to support these constructs.
+Internally, however, they are treated as standard predicates.
+
+\begin{center}
+  \footnotesize\sffamily
+  \newcommand{\predicate}[3]{#1 \texttt{#2\textit{#3}}}
+  \begin{tabular}{l l}
+    \toprule
+    Fact                              & Meaning                                         \\
+    \midrule
+    \predicate{subject}{can}{Action}  & The subject is permitted to perform the action. \\
+    \predicate{subject}{has}{Action}  & The subject has performed the action.           \\
+    \predicate{subject}{is}{Type}     & The subject is a member of the type.            \\
+    \predicate{subject}{must}{Action} & The subject must perform the action.            \\
+    \bottomrule
+  \end{tabular}
+\end{center}
+
+Facts of the \emph{must}-kind represent obligations, actions that should be completed if a particular scenario presents itself.
+For these facts we add a rule to ensure the obligation is performed.
+This rule should be checked periodically to ensure compliance.
+\begin{lstlisting}
+$\langle\text{speaker}\rangle$ says $\langle\text{subject}\rangle$ hasSatisfiedObligation$\langle\text{Action}\rangle$
+  if $\langle\text{subject}\rangle$ must$\langle\text{Action}\rangle$,
+     $\langle\text{subject}\rangle$ has$\langle\text{Action}\rangle$.
+\end{lstlisting}
+
+When using AppPAL to describe policies, we also need to describe what domain each variable belongs to.
+This is performed through the \emph{is}-kind facts.
 AppPAL inherits from SecPAL (and Datalog) a safety condition that all variables in the head of an assertion must be referenced in the body.
 This leads to policies which can be noisy to read.
 For example in the SANS policy there is a rule that states that devices can only connect to wireless access points owned by the company.
@@ -169,7 +199,7 @@ This is written in AppPAL as:
      AP isAccessPoint.
 \end{lstlisting}
 To simplify the presentation we allow a special sugared notation for conditionals expressing the type of a variable (\emph{variable \emph{is}Type}).
-Any variable in the head of the rule of the form \texttt{\emph{Type}:Variable} is replaced by the variable and a conditional that \textt{Variable is\emph{Type}} is added to the body.
+Any variable in the head of the rule of the form \texttt{\emph{Type}:Variable} is replaced by the variable and a conditional that \texttt{Variable is\emph{Type}} is added to the body.
 The rule can be re-written as shown bellow hiding the typing statements.
 \begin{lstlisting}
 'company' says Device:D canConnectToAP(AP:X)
