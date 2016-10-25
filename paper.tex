@@ -157,12 +157,24 @@ Continuing with the example above, this can be expressed in AppPAL as:
 
 \subsection{Changes to AppPAL}
 
-We have used AppPAL to formalise the BYOD policies.
-AppPAL is an instantiation of Becker's SecPAL~\cite{becker_secpal:_2010} we have previously used to describe app privacy preferences~\cite{hallett_apppal_2016}.
-To describe BYOD policies we have extended AppPAL with types.
-This allows our policies to be more succinct and readable whilst losing none of the expressive power.
-When describing variables in the head of an AppPAL assertion.
-
+When using AppPAL to describe policies, we need to describe what domain each variable belongs to.
+AppPAL inherits from SecPAL (and Datalog) a safety condition that all variables in the head of an assertion must be referenced in the body.
+This leads to policies which can be noisy to read.
+For example in the SANS policy there is a rule that states that devices can only connect to wireless access points owned by the company.
+This is written in AppPAL as:
+\begin{lstlisting}
+'company' says Device canConnectToAP(AP)
+  if AP isOwnedByCompany,
+     Device isDevice,
+     AP isAccessPoint.
+\end{lstlisting}
+To simplify the presentation we allow a special sugared notation for conditionals expressing the type of a variable (\emph{variable \emph{is}Type}).
+Any variable in the head of the rule of the form \texttt{\emph{Type}:Variable} is replaced by the variable and a conditional that \textt{Variable is\emph{Type}} is added to the body.
+The rule can be re-written as shown bellow hiding the typing statements.
+\begin{lstlisting}
+'company' says Device:D canConnectToAP(AP:X)
+  if X isOwnedByCompany.
+\end{lstlisting}
 
 \subsection{BYOD Policies}
 
