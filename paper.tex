@@ -1,4 +1,4 @@
-\documentclass{article}
+\documentclass{easychair}
 
 \usepackage{microtype}
 \usepackage{amsmath,amssymb,mathtools}
@@ -8,6 +8,8 @@
 \usepackage{pifont}
 \newcommand{\cmark}{\ding{51}}%
 \newcommand{\xmark}{\ding{55}}%
+
+\newcommand{\etal}{et~al.\@}
 
 \usepackage{acronym}
 \acrodef{MDM}{Mobile Device Management}
@@ -22,9 +24,9 @@
 }[keywords,strings]
 \newcommand{\listingsize}[0]{\footnotesize}
 \lstset{%
-  basicstyle=\ttfamily\listingsize,
-  keywordstyle=\ttfamily\slshape\listingsize,
-  stringstyle=\sffamily\listingsize,
+  basicstyle=\normalfont\ttfamily\listingsize,
+  keywordstyle=\normalfont\ttfamily\slshape\listingsize,
+  stringstyle=\normalfont\sffamily\listingsize,
   columns=flexible,
   mathescape,
   tabsize=2,
@@ -37,23 +39,28 @@
 }
 \newcommand{\code}[2][]{\lstinline[breaklines=true, #1]{#2}}
 
-\usepackage{framed}
-\newcommand{\todo}[1]{\marginpar{\begin{framed}\footnotesize\sffamily\raggedright #1\end{framed}}}
+\usepackage{mdframed}
+\newcommand{\todo}[1]{\marginpar{\begin{mdframed}[userdefinedwidth=1cm]\tiny\sffamily\raggedright #1\end{mdframed}}}
 
 \newenvironment{policyrule}[1]{%
-  \begin{framed}\footnotesize
+  \begin{mdframed}\footnotesize
       \noindent\textbf{\sffamily #1}:~\itshape%
 }{%
-  \end{framed}
+  \end{mdframed}
 }
 
 \title{Capturing Policies for BYOD}
 \author{Joseph Hallett and David Aspinall}
+\institute{University of Edinburgh}
 \begin{document}
 \maketitle
 
 \begin{abstract}
   % 4 Sentences
+  BYOD policies are informally specified using natural language.
+  Various tools and \ac{MDM} solutions can implement parts of the policies, but there isn't a means to tie the written policy to its enforcement method.
+  In this paper we show how AppPAL can be used to capture policies for BYOD.
+  We identify common BYOD idioms and delegation structures.
 \end{abstract}
 
 \section{Introduction}
@@ -103,13 +110,13 @@ The policies contain more than just configuration, however.
 Consider this rule taken from the \emph{Security Policy for the use of handheld devices in corporate environments} by SANS~\cite{nicholas_r._c._guerin_security_2008}:
 
 \newcommand{\textbra}[1]{\ensuremath{\left\langle \text{\sffamily #1} \right\rangle}}
-\begin{quote}
+\begin{policyrule}{SANS}
   Digital camera embedded on handheld devices \emph{might} be disabled in restricted environments, according to \textbra{COMPANY NAME} risk analysis.
   In sensitive facilities, information can be stolen using pictures and possibly sent using MMS or E-mail services.
 
   In high-security facilities such as R\&D labs or design manufacturers, camera MUST be disabled.
   Furthermore, MMS messages should be disabled as well, to prevent malicious users from sending proprietary pictures.
-\end{quote}
+\end{policyrule}
 
 To implement this policy an \ac{MDM} program, such as IBM's MaaS360 could be used~\cite{_ibm_????}.
 This software supports app wrapping (where an app is recompiled to use guarded APIs), and supports security ``checkboxes'' to enable security controls and access control policies.
@@ -393,6 +400,8 @@ But from the perspective of the policy itself it is more important \emph{who} ma
     & Specifies a string.                                                                  \\
     Number \texttt{isTelephoneNumber}           &                        &                         &                     & \cmark            & \cmark
     & Specifies a telephone number.                                                        \\
+    User \texttt{mustAcknowledged}(Policy)      & \cmark                 & \cmark                  & \cmark              & \cmark            & \cmark
+    & Requires the user to acknowledge a  policy.                                          \\
     Device \texttt{mustDisable}(Feature)        & \cmark                 & \cmark                  &                     & \cmark            & \cmark
     & Forces the disablement of a feature (or a device).                                   \\
     User \texttt{mustInform}(User, Something)   & \cmark                 &                         & \cmark              & \cmark            & \cmark
@@ -405,15 +414,130 @@ But from the perspective of the policy itself it is more important \emph{who} ma
   \label{tab:byod-predicates}
 \end{table}
 
-
 \subsection{BYOD Idioms}
 \todo{Describe common idioms and patterns found in each of the policies.  Check the earlier draft for some starting work}
 
+\subsubsection{Acknowledgement}
+
+All of the policies looked at require their subjects to be aware and acknowledge certain rules or policies, 
+  or that the company may perform certain actions.
+For example the NHS and HiMSS policies state that the company will wipe devices remotely to protect confidential information if the device is lost.
+Alongside these rules both policies also state that if an employee has personal information on the device then this will be lost also.
+The employee is required to be aware of this, and in the case of the HiMSS policy, agree to hold the company harmless for the loss.
+
+\begin{center}
+  \noindent
+  %\begin{minipage}{0.49\linewidth}
+    \begin{policyrule}{HiMSS}
+      I agree to hold XYZ Health System harmless for any loss relating to the
+      administration of PDA/Smartphone connectivity to XYZ Health System systems
+      including, but not limited to, loss of personal information stored on a
+      PDA/Smartphone due to data deletion done to protect sensitive information
+      related to XYZ Health System, its patients, members or partners.
+      \normalfont
+      \begin{lstlisting}
+'xyz-health-system' says 'user' mustAcknowledged('data-loss-policy').
+      \end{lstlisting}
+    \end{policyrule}
+  %\end{minipage}
+  %\begin{minipage}{0.49\linewidth}
+    \begin{policyrule}{NHS}
+      Individuals who have personal data of any kind stored on a corporately
+      issued mobile device must be aware that in the event of loss of the device
+      the above data wipe will include removal of all personal data.
+      \normalfont
+      \begin{lstlisting}
+'nhs-trust' says Staff:S can-say
+  S hasAcknowledged('data-loss-policy').
+'nhs-trust' says Staff:S mustAcknowledged('data-loss-policy').
+      \end{lstlisting}
+    \end{policyrule}   
+  %\end{minipage}
+\end{center}
+
+Both the SANS and the siren-company policies use acknowledgements to link to other sets of rules that employees should be aware of.
+These policies aren't further specified, and in the case of an acceptable use policy may be hard to enforce automatically.
+
+\begin{policyrule}{SANS}
+  Users MUST agree to the email security/acceptable use policy and eventually to the eCommerce security policy.
+  \begin{lstlisting}
+'company' says Employee:U mustAcknowledged('email-security'). 
+'company' says Employee:U mustAcknowledged('acceptable-use'). 
+'company' says Employee:U mustAcknowledged('ecommerce-security').
+  \end{lstlisting}
+\end{policyrule}
+\begin{policyrule}{Sirens}
+  The employee is expected to use his or her devices in an ethical manner at all times and adhere to the company's acceptable use policy.
+  \begin{lstlisting}
+'department' says Employee:E mustAcknowledged('acceptable-use').
+  \end{lstlisting}
+\end{policyrule}
+
+\todo{Provide a template for what kinds of policy should be implemented like this and template AppPAL.}
+
+\subsection{Delegation and Roles within Policies}
+
+AppPAL requires all assertions be made by an explicit speaker.
+When translating the policies the author of the policy is generally used as the speaker of the rule (\autoref{tab:principals}),
+  with the exception of the HiMSS policy that is written as a contract the user is agreeing to.
+All the policies delegate also describe other entities that might also make assertions.
+With AppPAL policies any speaker can delegate a decision to another speaker (with restrictions on re-delegation).
+This might be to a user to acknowledge a policy, or it might be to other groups in the company who are responsible for certain decisions.
+
+In all of the policies we looked at the majority of the decisions are made by three speakers: 
+  the company, the IT-department, and the users or employees.
+All of the policies also delegate to a user (apart from HiMSS where the user is the primary speaker).
+The user is typically responsible for providing information, such as agreements to policies, reporting devices missing, and updating passcodes.
+
+The Sirens, SANS and NHS policy each describe an IT-department who are delegated to make some decisions.
+The HiMSS policy also describes an \emph{xyz-health-system}, who act similarly to an IT-department.
+These decisions are more varied and can overlap with the responsibilities of the company.
+In the NHS and SANS policies the IT department is responsible for maintaining lists of activated devices.
+In the Sirens and SANS policies the IT department maintains a list of what is installable on a device or not.
+
+
+\begin{table}\centering\footnotesize
+  \begin{tabular}{l l}
+    \toprule
+    Policy      & Primary Speaker           \\
+    \midrule
+    {SANS}      & \emph{company}            \\
+    {HiMSS}     & \emph{user}               \\
+    {NHS}       & \emph{nhs-trust}          \\
+    {Edinburgh} & \emph{records-management} \\
+    {Sirens}    & \emph{department}         \\
+    \bottomrule
+  \end{tabular}
+  \label{tab:principals}
+  \caption{Principal Speakers from each of the policies examined.}
+\end{table}
 
 
 \section{Related Work}
 \label{sec:related}
 % 1-2 pages
+
+Companies have very little visibility into how their policies are implemented.
+Morrow notes that \emph{``particularly with the BYOD trend IT professionals don't know if anti-virus software is installed or if it it's current''}~\cite{morrow_byod_2012}.
+Even when devices have means to implement policies correctly it is difficult to ensure devices are properly configured when they are not corporately owned~\cite{tokuyoshi_security_2013}.
+Our work aims to address these problem directly: by using formal languages we can link the policy to the implementation.
+
+Armando~\etal~developed BYODroid as a tool for enforcing BYOD policies through a secure marketplace~\cite{armando_enabling_2014}.
+Their tool allows companies to distribute a secure app~store where through a combination of static and dynamic tools they can verify that apps follow fine-grained permission policies.
+Their policies are low level, based on ConSpec~\cite{aktug_conspec_2008}, allowing checks based on the JVM state.
+Using their tool they implemented parts of a policy relating to personal networks, and data management for the NATO Communications and Information Agency~\cite{armando_developing_2016}.
+Their work shows how parts of a BYOD policy can be checked for and enforced using tools.
+An AppPAL policy might use BYODroid to ensure that a parts of a policy are enforced (as well as other tools for other parts).
+AppPAL makes explicit how the natural language policy is implemented and by which tools.
+
+Costantino~\etal~created a role-based access control scheme for BYOD devices that allowed a company to verify the devices within their network and what servers and services they had access to~\cite{costantino_towards_2013}. The scheme relied on devices having a TPM however to ensure policy violations were reported.
+
+Other work has looked at using app wrapping to enforce more general policies.
+Tools, such as Dr.~Android and Mr.~Hyde~\cite{jeon_dr._2012} and Aurasium~\cite{xu_aurasium:_2012}, have suggested app wrapping as a possible way to enforce policies.
+This has the advantage that the device's underlying OS needn't be modified as the apps can be modified at the source code level.
+Many commercial \ac{MDM} solutions offer app-wrapping as a feature~\cite{_ibm_????,_app_????}, however app wrapping alone without additional analysis is insufficient to enforce policies effectively~\cite{hao_effectiveness_2013}.
+
+
 
 \section{Conclusions}
 \label{sec:conclusions}
@@ -424,4 +548,3 @@ But from the perspective of the policy itself it is more important \emph{who} ma
 \bibliography{paper}{}
 \bibliographystyle{plain}
 \end{document}
-
