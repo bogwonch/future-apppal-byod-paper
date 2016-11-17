@@ -1,4 +1,4 @@
-\documentclass{easychair}
+\documentclass{llncs}
 
 \usepackage{microtype}
 \usepackage{amsmath,amssymb,mathtools}
@@ -10,6 +10,8 @@
 \newcommand{\xmark}{\ding{55}}%
 
 \newcommand{\etal}{et~al.\@}
+
+\newcommand{\AppPAL}[0]{SecPAL4BYOD}
 
 \usepackage{acronym}
 \acrodef{MDM}{Mobile Device Management}
@@ -59,7 +61,7 @@
   % 4 Sentences
   BYOD policies are informally specified using natural language.
   Various tools and \ac{MDM} solutions can implement parts of the policies, but there isn't a means to tie the written policy to its enforcement method.
-  In this paper we show how AppPAL can be used to capture policies for BYOD.
+  In this paper we show how \AppPAL~can be used to capture policies for BYOD.
   We identify common BYOD idioms and delegation structures.
 \end{abstract}
 
@@ -91,10 +93,11 @@ These policies describe trust relationships inside the company between the IT de
 Policies contain rules that require employees to acknowledge risks, and regulations.
 An antivirus or \ac{MDM} program may be used to \emph{implement} part of a policy, but it is the policy which \emph{specifies} which software to use and when; there is no automatic way to check how a policy has been implemented and by what.
 
-This paper describes a formalization of five BYOD policies using AppPAL---a policy language for mobile device privacy preferences~\cite{hallett_apppal_2016}.
+This paper describes a formalization of five BYOD policies using a variation of SecPAL called \AppPAL.
+This has been implemented atop of AppPAL---a policy language for mobile device privacy preferences~\cite{hallett_apppal_2016}.
 Using our formalization we identify the common concerns and trust relationships in these policies.
-We show how AppPAL can be used to implement these policies, and describe precisely the different trust relationships.
-AppPAL is an instantiation of the SecPAL authorization language~\cite{becker_secpal:_2010} for mobile device policies.
+We show how \AppPAL\AppPALcan be used to implement these policies, and describe precisely the different trust relationships.
+\AppPAL\AppPALis an instantiation of the SecPAL authorization language~\cite{becker_secpal:_2010} for mobile device policies.
 We have found, however, that it is a good fit for other policies surround the mobile ecosystem as well~\cite{hallett_specifying_2016}.
 Using these papers we identify a set of standard decisions and trust relationships used in BYOD policies.
 These are BYOD idioms that are capture decisions at common requirements in BYOD policies.
@@ -134,7 +137,7 @@ Rather we attempt to capture the goals of the policy rule so that the delegation
 This gives us greater clarity as to which tool is being trusted to implement what policy.
 It allows us to see who is being trusted to make which decisions.
 It also lets us use automatic tools to uncover aspects of the policy that may be unimplemented~\cite{hallett_specifying_2016}.
-Continuing with the example above, this can be expressed in AppPAL as:
+Continuing with the example above, this can be expressed in \AppPAL~as:
 
 \begin{lstlisting}
 'company' says 'risk-analysis' can-say
@@ -154,7 +157,7 @@ Continuing with the example above, this can be expressed in AppPAL as:
 \end{lstlisting}
 
 \todo{%
-  Why is the AppPAL better?
+  Why is the \AppPAL~better?
   Clearer, explicit, can identify problems automatically.
 
   Explain why I'm trying to build a schema for BYOD policies and why this is worth a paper.
@@ -167,9 +170,9 @@ Continuing with the example above, this can be expressed in AppPAL as:
 \label{sec:details}
 % 5 pages
 
-\subsection{Changes to AppPAL}
+\subsection{Changes to \AppPAL}
 
-In order to describe BYOD specific conditions we instantiate AppPAL with four kinds of facts: \emph{can, has, is} and \emph{must}.
+In order to describe BYOD specific conditions we instantiate \AppPAL~with four kinds of facts: \emph{can, has, is} and \emph{must}.
 Like other SecPAL-based instantiations~\cite{becker_framework_2009,aziz_secpal4dsa:_2011} we extend the syntax of facts to support these constructs.
 Internally, however, they are treated as standard predicates.
 
@@ -197,12 +200,12 @@ $\langle\text{speaker}\rangle$ says $\langle\text{subject}\rangle$ hasSatisfiedO
      $\langle\text{subject}\rangle$ has$\langle\text{Action}\rangle$.
 \end{lstlisting}
 
-When using AppPAL to describe policies, we also need to describe what domain each variable belongs to.
+When using \AppPAL~to describe policies, we also need to describe what domain each variable belongs to.
 This is performed through the \emph{is}-kind facts.
-AppPAL inherits from SecPAL (and Datalog) a safety condition that all variables in the head of an assertion must be referenced in the body.
+\AppPAL~inherits from SecPAL (and Datalog) a safety condition that all variables in the head of an assertion must be referenced in the body.
 This leads to policies which can be noisy to read.
 For example in the SANS policy there is a rule that states that devices can only connect to wireless access points owned by the company.
-This is written in AppPAL as:
+This is written in \AppPAL~as:
 \begin{lstlisting}
 'company' says Device canConnectToAP(AP)
   if AP isOwnedByCompany,
@@ -230,7 +233,7 @@ It is relatively short but interesting because it contains concerns specific to 
 In contrast every other policy we looked at is written as a series of rules users should follow to ensure compliance.
 The policy is designed as a sample agreement for a system trying to manage personal mobile devices in a healthcare environment.
 The third is taken from an British hospital trust~\cite{kennington_mobiles_2014}, and describes the BYOD scheme used in practice at the hospital.
-Finally two simpler policies are taken from Edinburgh university~\cite{david_williamson_bring_2015} and a company specialising in emergency sirens~\cite{code3pse.org_sample_????}.
+Finally two simpler policies are taken from The University of Edinburgh~\cite{david_williamson_bring_2015} and a company specialising in emergency sirens~\cite{code3pse.org_sample_????}.
 These policies are simpler than the other comprised of much more general rules and only a page or two in length.
 
 \begin{table}\centering\footnotesize\sffamily
@@ -252,10 +255,10 @@ These policies are simpler than the other comprised of much more general rules a
 \end{table}
 
 The policies are summarised in \autoref{tab:summary}.
-Each policy contains a series of \emph{rules}, which are implemented by one or more \emph{AppPAL assertions}.
-The \emph{policy coverage} represents the number of rules that have an AppPAL description attached.
+Each policy contains a series of \emph{rules}, which are implemented by one or more \emph{\AppPAL~assertions}.
+The \emph{policy coverage} represents the number of rules that have a \AppPAL~description attached.
 
-Not all the rules in a policy require an AppPAL translation.
+Not all the rules in a policy require a \AppPAL~translation.
 For example rule 9.1 in the NHS policy states:
 \begin{policyrule}{NHS}
   Downloading of personal apps onto a corporately issued mobile device should be avoided where possible.
@@ -341,7 +344,7 @@ As part of selecting the apps an IT department or group may chose to use advance
 But from the perspective of the policy itself it is more important \emph{who} makes the decision rather than \emph{what} they chose, if they have an opinion at all.
 
 \begin{table}\centering\footnotesize
-  \newcommand{\angledtitle}[1]{\rlap{\rotatebox{30}{#1}}}
+  \newcommand{\angledtitle}[1]{\rlap{\rotatebox{45}{#1}}\hspace{1em}}
   \sffamily
   \begin{tabular}{l c c c c c p{0.45\linewidth} }
     \toprule
@@ -410,7 +413,7 @@ But from the perspective of the policy itself it is more important \emph{who} ma
     & Forces a device to be erased.                                                        \\
     \bottomrule
   \end{tabular}
-  \caption{Summary of AppPAL facts used in multiple BYOD policies.}
+  \caption{Summary of \AppPAL~facts used in multiple BYOD policies.}
   \label{tab:byod-predicates}
 \end{table}
 
@@ -473,15 +476,15 @@ These policies aren't further specified, and in the case of an acceptable use po
   \end{lstlisting}
 \end{policyrule}
 
-\todo{Provide a template for what kinds of policy should be implemented like this and template AppPAL.}
+\todo{Provide a template for what kinds of policy should be implemented like this and template \AppPAL.}
 
 \subsection{Delegation and Roles within Policies}
 
-AppPAL requires all assertions be made by an explicit speaker.
+\AppPAL~requires all assertions be made by an explicit speaker.
 When translating the policies the author of the policy is generally used as the speaker of the rule (\autoref{tab:principals}),
   with the exception of the HiMSS policy that is written as a contract the user is agreeing to.
 All the policies delegate also describe other entities that might also make assertions.
-With AppPAL policies any speaker can delegate a decision to another speaker (with restrictions on re-delegation).
+With \AppPAL~policies any speaker can delegate a decision to another speaker (with restrictions on re-delegation).
 This might be to a user to acknowledge a policy, or it might be to other groups in the company who are responsible for certain decisions.
 
 In all of the policies we looked at the majority of the decisions are made by three speakers: 
@@ -527,8 +530,8 @@ Their tool allows companies to distribute a secure app~store where through a com
 Their policies are low level, based on ConSpec~\cite{aktug_conspec_2008}, allowing checks based on the JVM state.
 Using their tool they implemented parts of a policy relating to personal networks, and data management for the NATO Communications and Information Agency~\cite{armando_developing_2016}.
 Their work shows how parts of a BYOD policy can be checked for and enforced using tools.
-An AppPAL policy might use BYODroid to ensure that a parts of a policy are enforced (as well as other tools for other parts).
-AppPAL makes explicit how the natural language policy is implemented and by which tools.
+A \AppPAL~policy might use BYODroid to ensure that a parts of a policy are enforced (as well as other tools for other parts).
+\AppPAL~makes explicit how the natural language policy is implemented and by which tools.
 
 Costantino~\etal~created a role-based access control scheme for BYOD devices that allowed a company to verify the devices within their network and what servers and services they had access to~\cite{costantino_towards_2013}. The scheme relied on devices having a TPM however to ensure policy violations were reported.
 
