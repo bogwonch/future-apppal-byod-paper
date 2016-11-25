@@ -4,6 +4,7 @@
 \usepackage{amsmath,amssymb,mathtools}
 \usepackage{hyperref}
 \usepackage{booktabs}
+\usepackage{graphicx}
 
 \usepackage{pifont}
 \newcommand{\cmark}{\ding{51}}%
@@ -26,9 +27,9 @@
 }[keywords,strings]
 \newcommand{\listingsize}[0]{\footnotesize}
 \lstset{%
-  basicstyle=\normalfont\ttfamily\listingsize,
-  keywordstyle=\normalfont\ttfamily\slshape\listingsize,
-  stringstyle=\normalfont\sffamily\listingsize,
+  basicstyle=\normalfont\ttfamily,%\listingsize,
+  keywordstyle=\normalfont\ttfamily\slshape,%\listingsize,
+  stringstyle=\normalfont\sffamily,%\listingsize,
   columns=flexible,
   mathescape,
   tabsize=2,
@@ -56,7 +57,6 @@
 \institute{University of Edinburgh}
 \begin{document}
 \maketitle
-
 \begin{abstract}
   % 4 Sentences
   BYOD policies are informally specified using natural language.
@@ -64,7 +64,6 @@
   In this paper we show how \AppPAL~can be used to capture policies for BYOD.
   We identify common BYOD idioms and delegation structures.
 \end{abstract}
-
 \section{Introduction}
 \label{sec:intro}
 % Describe the problem
@@ -96,8 +95,8 @@ An antivirus or \ac{MDM} program may be used to \emph{implement} part of a polic
 This paper describes a formalization of five BYOD policies using a variation of SecPAL called \AppPAL.
 This has been implemented atop of AppPAL---a policy language for mobile device privacy preferences~\cite{hallett_apppal_2016}.
 Using our formalization we identify the common concerns and trust relationships in these policies.
-We show how \AppPAL\AppPALcan be used to implement these policies, and describe precisely the different trust relationships.
-\AppPAL\AppPALis an instantiation of the SecPAL authorization language~\cite{becker_secpal:_2010} for mobile device policies.
+We show how \AppPAL~can be used to implement these policies, and describe precisely the different trust relationships.
+\AppPAL~is an instantiation of the SecPAL authorization language~\cite{becker_secpal:_2010} for mobile device policies.
 We have found, however, that it is a good fit for other policies surround the mobile ecosystem as well~\cite{hallett_specifying_2016}.
 Using these papers we identify a set of standard decisions and trust relationships used in BYOD policies.
 These are BYOD idioms that are capture decisions at common requirements in BYOD policies.
@@ -156,6 +155,11 @@ Continuing with the example above, this can be expressed in \AppPAL~as:
      Location isHighSecurityFacility.
 \end{lstlisting}
 
+When checking a policy written in a formal language we generate a certificate that shows how the policy was satisfied.
+These certificates not only act as proof of how the policy was followed but also provide an audit trail.
+In a company decisions may be delegated to different departments.
+Knowing who made the decision in each department, and whether that was on the basis of policy or a one-off, allows auditors to see what happened when things go wrong, and builds trust that a system is working correctly.
+
 \todo{%
   Why is the \AppPAL~better?
   Clearer, explicit, can identify problems automatically.
@@ -166,13 +170,15 @@ Continuing with the example above, this can be expressed in \AppPAL~as:
   Examples of policy idioms we can't express.
 }
 
+
+
 \section{The Details}
 \label{sec:details}
 % 5 pages
 
 \subsection{Changes to \AppPAL}
 
-In order to describe BYOD specific conditions we instantiate \AppPAL~with four kinds of facts: \emph{can, has, is} and \emph{must}.
+To create \AppPAL~we instantiate SecPAL~with four kinds of facts specific to BYOD: \emph{can, has, is} and \emph{must}.
 Like other SecPAL-based instantiations~\cite{becker_framework_2009,aziz_secpal4dsa:_2011} we extend the syntax of facts to support these constructs.
 Internally, however, they are treated as standard predicates.
 
@@ -221,6 +227,7 @@ The rule can be re-written as shown bellow hiding the typing statements.
 \end{lstlisting}
 
 \subsection{BYOD Policies}
+\label{ssec:byod-policies}
 
 We analysed five different policies to find common idioms.
 The first is the \emph{Security Policy Template: Use of Handheld Devices in a Corporate Environment}, published by the SANS Institute~\cite{nicholas_r._c._guerin_security_2008}.
@@ -242,7 +249,7 @@ These policies are simpler than the other comprised of much more general rules a
                              & {SANS}       & {HiMSS}     & {NHS}       & {Edinburgh} & {Sirens}    \\
     \midrule
     Number of rules          & 33           & 15          & 56          &             & 25          \\
-    SecPAL assertions        & 71           & 21          & 58          & 10          & 39          \\
+    \AppPAL~assertions       & 71           & 21          & 58          & 10          & 39          \\
     Policy coverage          & 33 (100$\%$) & 14 (93$\%$) & 40 (71$\%$) &             & 22 (88$\%$) \\
     \midrule
     Delegations              & 23           & 5           & 33          & 2           & 13          \\
@@ -323,12 +330,13 @@ Apps have to be approved by three different groups (the Integrated Governance Co
   manager and there should be a demonstrable benefit.
   \normalfont
   \begin{lstlisting}
-'nhs-trust' says App isInstallable if App hasMet('clinical-use-case').
-'nhs-trust' says App isInstallable if App hasMet('business-use-case').
+'nhs-trust' says App isUsable if App hasMet('clinical-use-case').
+'nhs-trust' says App isUsable if App hasMet('business-use-case').
 'nhs-trust' says 'cacpg' can-say App:A hasMet('clinical-use-case').
 'nhs-trust' says 'mig' can-say App:A hasMet('business-use-case').
 'nhs-trust' says App isInstallable
-  if App hasMet('final-app-approval').
+if App hasMet('final-app-approval'),
+   App isUsable.
 'nhs-trust' says 'igc' can-say App hasMet('final-app-approval').
 'nhs-trust' says Device canInstall(App)
   if App isInstallable,
@@ -342,6 +350,45 @@ Given that user's have privacy preferences expressible as permissions~\cite{lin_
 This does not appear to be the case, however. 
 As part of selecting the apps an IT department or group may chose to use advanced instrumentation and policies~\cite{armando_enabling_2014}, or they may manually chose apps to form a curated app store as some \ac{MDM} vendors allow.
 But from the perspective of the policy itself it is more important \emph{who} makes the decision rather than \emph{what} they chose, if they have an opinion at all.
+
+\subsection{Worked Examples}
+
+Using the NHS rules for finding approved apps (\autoref{ssec:byod-policies}) as an example, suppose an employee, \emph{Alice}, wished to get an app, \emph{\ttfamily com.microsoft.office}, approved and installed on their device.
+To do so Alice would have to convince the device that \lstinline{'nhs-trust' says 'alices-phone' canInstall('com.microsoft.office').}
+Alice wishes to use the app for business so in order to satisfy the policy Alice must collect the following statements:
+\begin{itemize}
+    \newcommand{\weitemsize}[0]{\footnotesize}
+  \item {\weitemsize \lstinline{'nhs-trust' says 'com.microsoft.office' isInstallable.}\newline}
+    To do this she needs a statement from the Management of Information Group that it has a business use-case, and from the Integrated Governance Comitee that it is finally approved.
+    \begin{enumerate}\setcounter{enumi}{0}
+      \item {\weitemsize \lstinline{'mig' says 'com.microsoft.office' hasMet('business-use-case').}}
+      \item {\weitemsize \lstinline{'igc' says 'com.microsoft.office' hasMet('final-app-approval').}}
+    \end{enumerate}
+  \item {\weitemsize \lstinline{'nhs-trust' says 'com.microsoft.office' isApprovedFor('alices-device').}}
+    To get this she needs a statement from the manager responsible for Alice's device (\emph{Bob}) approving the app.
+    \begin{enumerate}\setcounter{enumi}{2}
+      \item {\weitemsize \lstinline{'bob' says 'com.microsoft.office' isApprovedFor('alices-device').}}
+      \item {\weitemsize \lstinline{'nhs-trust' says 'bob' isResponsibleFor('alices-device').}}
+    \end{enumerate}
+  \item Additionally she needs the following typing statements.
+    \begin{enumerate}\setcounter{enumi}{4}
+      \item {\weitemsize \lstinline{'nhs-trust' says 'com.microsoft.office' isApp.}} \label{item:isapp}
+      \item {\weitemsize \lstinline{'nhs-trust' says 'bob' isEmployee.}}
+    \end{enumerate}
+\end{itemize}
+
+Alice obtains the statements by contacting each of the speakers. 
+Each may either give her the statement she needs or may give her additional rules.
+For example the MIG and IGC may be happy to state their assertions (after a review).
+When checking if the app is an App in \autoref{item:isapp}, the NHS trust may be instead inclined to delegate further.
+They could reply that if the App is in the Google Play store then they're convinced it is an app.
+Alice would then have to obtain additional statements if she wanted to prove this statement.
+As with SecPAL, all assertions should be accompanied by a signature from their speaker proving they said the assertion.
+Alternatively the speaker could refuse to give the statement, either because they don't believe it to be true, or they cannot give an answer.
+In this case Alice would have to look for an alternative means to prove the statement or accept that they cannot install the app.
+
+Once all the statements have been collected into an \emph{assertion context}.
+Alice can use a SecPAL inference tool (such as AppPAL~\footnote{https://github.com/apppal/libapppal}) to check the policy has been satisfied.
 
 \begin{table}\centering\footnotesize
   \newcommand{\angledtitle}[1]{\rlap{\rotatebox{45}{#1}}\hspace{1em}}
@@ -498,7 +545,6 @@ These decisions are more varied and can overlap with the responsibilities of the
 In the NHS and SANS policies the IT department is responsible for maintaining lists of activated devices.
 In the Sirens and SANS policies the IT department maintains a list of what is installable on a device or not.
 
-
 \begin{table}\centering\footnotesize
   \begin{tabular}{l l}
     \toprule
@@ -515,6 +561,37 @@ In the Sirens and SANS policies the IT department maintains a list of what is in
   \caption{Principal Speakers from each of the policies examined.}
 \end{table}
 
+\section{Comparison with Existing MDM Software}
+
+To evaluate \AppPAL~we compare it to existing MDM~tools: IBM's MaaS360, MobileIron, and VMWare's AirWatch; each leading MDM packages~\cite{rob_smith_magic_2016}.
+We used the Android versions of each of these tools as they all supported Android.
+Each of these tools support enforcing and checking compliance policies. 
+They do not, however, use policy languages to specify policies; rather they supply canned policies and rules that admins can tweak.
+
+
+\subsection{Acknowledgement}
+
+Acknowledgements form a large portion of the BYOD policies we looked at but are not addressed by the MDM software at all.
+MaaS360 can associate users with devices, and can assign them into groups but there is currently no means to track what policies a user has agreed to or should be agreeing to.
+Users can be added to groups, which can have separate policies.
+One might imagine that users who have acknowledged some additional rules might be added to additional groups with stricter or more relaxed policies, but this is a manual process for an administrator to set up and manage.
+
+More generally, MaaS360 does not generally provide a means to apply policies on the basis of policies.
+Consider the following rule taken from the SANS policy:
+\begin{policyrule}{SANS}
+Any non business-owned (that, is private) device must be able to connect to Company network MUST first be approved by technical personnel such as those from the Company IT department or desktop support.
+If allowed, privately-owned handheld devices MUST comply with this security policy and MUST be inventoried along with corporate handhelds, but identified as private. This is in order to prevent theft of corporate data with unmanaged handhelds (i.e. owner of device is not identified).
+\end{policyrule}
+Administrators can use MaaS360 to mark devices as privately owned.
+A group could be set up for approved privately-owend devices.
+MaaS360 allows the creation of groups based on search criteria, (\autoref{fig:maas360search}), though the groups are not dynamic\footnote{The search would need to be re-run when new devices were added or a device's status changed.}.
+Technical personnel could be given an administrator login to the MDM software to add devices to this group periodically.
+
+\begin{figure}\centering
+  \includegraphics[width=\linewidth]{figures/maas-groupsearch.png}
+  \caption{MaaS360's search interface for devices.}
+  \label{fig:maas360search}
+\end{figure}
 
 \section{Related Work}
 \label{sec:related}
