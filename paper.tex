@@ -568,24 +568,50 @@ We used the Android versions of each of these tools as they all supported Androi
 Each of these tools support enforcing and checking compliance policies. 
 They do not, however, use policy languages to specify policies; rather they supply canned policies and rules that admins can tweak.
 
-
-\subsection{Acknowledgement}
-
 Acknowledgements form a large portion of the BYOD policies we looked at but are not addressed by the MDM software at all.
-MaaS360 can associate users with devices, and can assign them into groups but there is currently no means to track what policies a user has agreed to or should be agreeing to.
-Users can be added to groups, which can have separate policies.
-One might imagine that users who have acknowledged some additional rules might be added to additional groups with stricter or more relaxed policies, but this is a manual process for an administrator to set up and manage.
+MaaS360 can associate users with devices, and can assign them into groups.
+It can distribute documents (which could include written policies) but there is currently no means to track what policies a user has agreed to or should be agreeing to.
+Administrators could add user's who've acknowledged a policy to a group
+One might imagine that users who have acknowledged some additional rules might be added to additional groups with stricter or more relaxed policies, but this is a semi-manual process for an administrator to set up and manage.
+In contrast \AppPAL{} is more flexible. 
+It allows a user to state which policies they have acknowledged, and for policies to delegate the acknowledgement of the policy to the user.
+We can require that a user must acknowledge certain policies if they meet certain criteria;
+and once the assertion has been made it can be imported wherever and used in making other decisions.
 
-More generally, MaaS360 does not generally provide a means to apply policies on the basis of policies.
+This lack of flexibility extends to trying to compose policies. 
 Consider the following rule taken from the SANS policy:
 \begin{policyrule}{SANS}
 Any non business-owned (that, is private) device must be able to connect to Company network MUST first be approved by technical personnel such as those from the Company IT department or desktop support.
 If allowed, privately-owned handheld devices MUST comply with this security policy and MUST be inventoried along with corporate handhelds, but identified as private. This is in order to prevent theft of corporate data with unmanaged handhelds (i.e. owner of device is not identified).
 \end{policyrule}
-Administrators can use MaaS360 to mark devices as privately owned.
-A group could be set up for approved privately-owend devices.
+Implementing this in an MDM solution such as MaaS360 administrators can mark some devices as being privately owned.
+A group could be set up for approved privately-owned devices.
 MaaS360 allows the creation of groups based on search criteria, (\autoref{fig:maas360search}), though the groups are not dynamic\footnote{The search would need to be re-run when new devices were added or a device's status changed.}.
-Technical personnel could be given an administrator login to the MDM software to add devices to this group periodically.
+Technical personnel could be given an administrator login to the MDM software to add devices to this group periodically, and could pass them along for inventorying.
+Again the management of \emph{who} is \emph{technical personnel} is effectively manual, with optional searches to define groups.
+Once we find those devices that we should allow to connect to a network we can add an access control rule to as well as enforcing the general security policy on.
+
+\begin{lstlisting}
+'company' says Device:D canConnectTo(Network:N)
+  if N isCompanyOwned,
+     D isPrivatelyOwned,
+     D isApproved,
+     D hasMet('security-policy').
+
+'company' says 'technical-personnel' can-say
+  Device:D isApproved.
+
+'company' says 'it-department' can-act-as 'technical-personnel'.
+'company' says' 'desktop-support' can-act-as 'technical-personnel'.
+\end{lstlisting}
+
+In contrast using \AppPAL~all relationships are specified by the policy.
+We are free to use conformance to one policy as a conditional for applying a second.
+Roles such as being \emph{technical personnel} can be given to users holding other roles without requiring manual intervention.
+Furthermore the \AppPAL~rule is presented in much the same form as the rule in the policy document:  device can do action if checks are satisfied.
+
+
+
 
 \begin{figure}\centering
   \includegraphics[width=\linewidth]{figures/maas-groupsearch.png}
