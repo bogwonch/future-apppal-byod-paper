@@ -92,15 +92,45 @@ These policies describe trust relationships inside the company between the IT de
 Policies contain rules that require employees to acknowledge risks, and regulations.
 An antivirus or \ac{MDM} program may be used to \emph{implement} part of a policy, but it is the policy which \emph{specifies} which software to use and when; there is no automatic way to check how a policy has been implemented and by what.
 
-This paper describes a formalization of five BYOD policies using a variation of SecPAL called \AppPAL.
-This has been implemented atop of AppPAL---a policy language for mobile device privacy preferences~\cite{hallett_apppal_2016}.
-Using our formalization we identify the common concerns and trust relationships in these policies.
-We show how \AppPAL~can be used to implement these policies, and describe precisely the different trust relationships.
-\AppPAL~is an instantiation of the SecPAL authorization language~\cite{becker_secpal:_2010} for mobile device policies.
-We have found, however, that it is a good fit for other policies surround the mobile ecosystem as well~\cite{hallett_specifying_2016}.
-Using these papers we identify a set of standard decisions and trust relationships used in BYOD policies.
+Using a formalization of five BYOD policies written in \AppPAL~we identify different idioms and common delegation patterns present in BYOD policies.
+Our formalizations help identify the common concerns and trust relationships in these policies.
+We identify a set of standard decisions and trust relationships used in BYOD policies.
 These are BYOD idioms that are capture decisions at common requirements in BYOD policies.
 These give a guide for where future work implementing BYOD tools should focus their efforts to cover more aspects of policies.
+
+We show how \AppPAL~can be used to implement these policies, and describe precisely the different trust relationships.
+\AppPAL~is an instantiation of the SecPAL authorization language~\cite{becker_secpal:_2010} for mobile device policies, and implemented atop of AppPAL~\cite{hallett_apppal_2016}.
+We have found, however, that SecPAL is a good tool for describing other policies surround the mobile ecosystem as well~\cite{hallett_specifying_2016}, and our AppPAL implementation can be extended to support new types of policies.
+
+\section{Related Work}
+\label{sec:related}
+% 1-2 pages
+
+Companies have very little visibility into how their policies are implemented.
+Morrow notes that \emph{``particularly with the BYOD trend IT professionals don't know if anti-virus software is installed or if it it's current''}~\cite{morrow_byod_2012}.
+Even when devices have means to implement policies correctly it is difficult to ensure devices are properly configured when they are not corporately owned~\cite{tokuyoshi_security_2013}.
+Our work aims to address these problem directly: by using formal languages we can link the policy to the implementation.
+
+Martinelli~\etal{}'s work has looked at creating a dynamic permissions manager, called UC-Droid,
+that can alter what Android permissions an app is given at run time based on policies~\cite{martinelli_enhancing_2016}.
+This allows companies to reconfigure an apps permissions based on whether the employee is at work, in a highly sensitive lab, or working out-of-hours.
+These kinds of policies are far more configurable than the geo-fenced base policies existing MDM packages provide.
+Other work has looked at enforcing different policies based on what roles an employee holds~\cite{costantino_towards_2013}.
+This allowed a company to verify the devices within their network and what servers and services they had access to, as well as providing different user's with different policies.
+
+Armando~\etal~developed BYODroid as a tool for enforcing BYOD policies through a secure marketplace~\cite{armando_enabling_2014}.
+Their tool allows companies to distribute a secure app~store where through a combination of static and dynamic tools they can verify that apps follow fine-grained permission policies.
+Their policies are low level, based on ConSpec~\cite{aktug_conspec_2008}, allowing checks based on the JVM state.
+Using their tool they implemented parts of a policy relating to personal networks, and data management for the NATO Communications and Information Agency~\cite{armando_developing_2016}.
+Their work shows how parts of a BYOD policy can be checked for and enforced using tools.
+A \AppPAL~policy might use BYODroid to ensure that a parts of a policy are enforced (as well as other tools for other parts).
+\AppPAL~makes explicit how the natural language policy is implemented and by which tools.
+
+Other work has looked at using app wrapping to enforce more general policies.
+Tools, such as Dr.~Android and Mr.~Hyde~\cite{jeon_dr._2012} and Aurasium~\cite{xu_aurasium:_2012}, have suggested app wrapping as a possible way to enforce policies.
+This has the advantage that the device's underlying OS needn't be modified as the apps can be modified at the source code level.
+Many commercial \ac{MDM} solutions offer app-wrapping as a feature~\cite{_ibm_????,_app_????}, however app wrapping alone without additional analysis is insufficient to enforce policies effectively~\cite{hao_effectiveness_2013}.
+
 
 \section{My Idea}
 \label{sec:idea}
@@ -139,7 +169,7 @@ It also lets us use automatic tools to uncover aspects of the policy that may be
 Continuing with the example above, this can be expressed in \AppPAL~as:
 
 \begin{lstlisting}
-'company' says 'risk-analysis' can-say
+'company' says 'risk-analyst' can-say
   Location:L isHighSecurityFacility.
 
 'company' says Device:D mustDisableIn(Location, 'camera')
@@ -160,23 +190,13 @@ These certificates not only act as proof of how the policy was followed but also
 In a company decisions may be delegated to different departments.
 Knowing who made the decision in each department, and whether that was on the basis of policy or a one-off, allows auditors to see what happened when things go wrong, and builds trust that a system is working correctly.
 
-\todo{%
-  Why is the \AppPAL~better?
-  Clearer, explicit, can identify problems automatically.
-
-  Explain why I'm trying to build a schema for BYOD policies and why this is worth a paper.
-
-  How is this falsifiable?
-  Examples of policy idioms we can't express.
-}
-
-
 
 \section{The Details}
 \label{sec:details}
 % 5 pages
 
-\subsection{Changes to \AppPAL}
+\subsection{Changes from SecPAL}
+\label{ssec:changes}
 
 To create \AppPAL~we instantiate SecPAL~with four kinds of facts specific to BYOD: \emph{can, has, is} and \emph{must}.
 Like other SecPAL-based instantiations~\cite{becker_framework_2009,aziz_secpal4dsa:_2011} we extend the syntax of facts to support these constructs.
@@ -274,10 +294,10 @@ For example rule 9.1 in the NHS policy states:
 \end{policyrule}
 The rule does not prohibit any action, and doesn't require the staff to do anything different.
 It does remind staff to be aware of a rule which we could implement with an acknowledgement; a statement that the party has acknowledged a rule.
-\begin{lstlisting}
-'nhs-trust' says Staff:S mustAcknowledge('avoid-installing-personal-apps').
-'nhs-trust' says Staff:S mustAcknowledge('social-media-policy').
-\end{lstlisting}
+%\begin{lstlisting}
+%'nhs-trust' says Staff:S mustAcknowledge('avoid-installing-personal-apps').
+%'nhs-trust' says Staff:S mustAcknowledge('social-media-policy').
+%\end{lstlisting}
 In this case, however, since nothing is required even an acknowledgement seems excessive.
 
 Table~\ref{tab:byod-predicates} summarises the facts used by multiple policies.
@@ -293,13 +313,13 @@ These common concerns suggest where future \ac{MDM} software should focus their 
 Only the NHS and SANS, the two most complex policies, describe when a device can install an app and what kinds of apps are installable.
 In both policies this is predominantly limited to a delegation to the appropriate groups to authorize an app.
 For example, in the SANS policy the IT-Department are responsible for deciding what apps can be installed.
-\begin{policyrule}{SANS}
-  The IT Department maintains lists of allowed and unauthorized applications and makes them available to users on the intranet.
-  \normalfont
-  \begin{lstlisting}
-'company' says 'it-department' can-say App:A isInstallable.
-  \end{lstlisting}
-\end{policyrule}
+%\begin{policyrule}{SANS}
+%  The IT Department maintains lists of allowed and unauthorized applications and makes them available to users on the intranet.
+%  \normalfont
+%  \begin{lstlisting}
+%'company' says 'it-department' can-say App:A isInstallable.
+%  \end{lstlisting}
+%\end{policyrule}
 The NHS policy, however, is significantly more complicated.
 Apps have to be approved by three different groups (the Integrated Governance Committee, the Employee's manager, and the relevant group within the trust depending on where the employee works) before the trust will say that an app can be installed.
 \begin{policyrule}{NHS}
@@ -390,140 +410,9 @@ In this case Alice would have to look for an alternative means to prove the stat
 Once all the statements have been collected into an \emph{assertion context}.
 Alice can use a SecPAL inference tool (such as AppPAL~\footnote{https://github.com/apppal/libapppal}) to check the policy has been satisfied.
 
-\begin{table}\centering\footnotesize
-  \newcommand{\angledtitle}[1]{\rlap{\rotatebox{45}{#1}}\hspace{1em}}
-  \sffamily
-  \begin{tabular}{l c c c c c p{0.45\linewidth} }
-    \toprule
-    Predicate                                   & \angledtitle{Sirens}   & \angledtitle{Edinburgh} & \angledtitle{HiMMS} & \angledtitle{NHS} & \angledtitle{SANS}
-    & Description                                                                          \\
-    \midrule
-    Device \texttt{canBackupTo}(Server)         &                        & \cmark                  & \cmark              &                   &
-    & Says the device may send backups to a server.                                        \\
-    Device \texttt{canCall}(Number)             &                        &                         &                     & \cmark            & \cmark
-    & Says the telephone numbers a device can call.                                        \\
-    Device \texttt{canConnectToAP}(AP)          &                        &                         & \cmark              &                   & \cmark
-    & Says a device may associate with an access point.                                    \\
-    Device \texttt{canConnectToNetwork}(Subnet) & \cmark                 &                         &                     &                   & \cmark
-    & Says the device may connect to a network, for example computers all within a subnet. \\
-    Device \texttt{canConnectToServer}(IP)      &                        &                         &                     & \cmark            & \cmark
-    & Says the subject (a device) can connect to a given server (identified by a URL).    \\
-    Device \texttt{canInstall}(App)             &                        &                         &                     & \cmark            & \cmark
-    & Says the device may install an app.                                                  \\
-    User \texttt{canMonitor}(Device)            & \cmark                 &                         &                     & \cmark            & \cmark
-    & Says the subject (a user) can monitor and unlock a device.                           \\
-    Device \texttt{canStore}(File)              &                        &                         & \cmark              &                   & \cmark
-    & Says a device may store some data in permanent (non-transient) storage.              \\
-    User \texttt{canUse}(Device)                &                        &                         &                     & \cmark            & \cmark
-    & Says a user may use a device.                                                        \\
-    User \texttt{hasAcknowledged}(Policy)       & \cmark                 & \cmark                  & \cmark              & \cmark            & \cmark
-    & Says an individual has acknowledged a policy.                                        \\
-    Device \texttt{hasFeature}(Feature)         &                        & \cmark                  &                     & \cmark            &
-    & Says a device has a feature enabled.                                                 \\
-    Something \texttt{hasMet}(Policy)           &                        & \cmark                  &                     & \cmark            & \cmark
-    & Says a something has met a given set of requirements.                                \\
-    Device \texttt{isActivated}                 &                        &                         & \cmark              & \cmark            & \cmark
-    & Specifies a device has been activated for BYOD usage.                                \\
-    App \texttt{isApp}                          & \cmark                 &                         & \cmark              & \cmark            & \cmark
-    & Specifies an app.                                                                    \\
-    Something \texttt{isApproved}               &                        &                         & \cmark              &                   & \cmark
-    & Specifies that something has been vetted and approved of.                            \\
-    Data \texttt{isData}                        & \cmark                 &                         &                     &                   & \cmark
-    & Specifies data.                                                                      \\
-    Device \texttt{isDevice}                    & \cmark                 & \cmark                  & \cmark              & \cmark            & \cmark
-    & Specifies a device.                                                                  \\
-    User \texttt{isEmployee}                    & \cmark                 & \cmark                  &                     & \cmark            & \cmark
-    & Specifies that someone is an employee.                                               \\
-    Device \texttt{isEncrypted}                 &                        & \cmark                  &                     & \cmark            & \cmark
-    & Specifies a device is encrypted.                                                     \\
-    Feature \texttt{isFeature}                  & \cmark                 &                         &                     &                   & \cmark
-    & Specifies a feature.                                                                 \\
-    App \texttt{isInstallable}                  &                        &                         &                     & \cmark            & \cmark
-    & Specifies an app is installable.                                                     \\
-    Device \texttt{isLost}                      & \cmark                 &                         & \cmark              & \cmark            & \cmark
-    & Specifies a device is missing.                                                       \\
-    Device \texttt{isOwnedBy}(User)             & \cmark                 & \cmark                  & \cmark              & \cmark            & \cmark
-    & Specifies something's owner.                                                         \\
-    File \texttt{isSecurityLevel}(Level)        &                        &                         & \cmark              &                   & \cmark
-    & Specifies some data as having business sensitive information.                        \\
-    Something \texttt{isString}                 & \cmark                 &                         &                     & \cmark            &
-    & Specifies a string.                                                                  \\
-    Number \texttt{isTelephoneNumber}           &                        &                         &                     & \cmark            & \cmark
-    & Specifies a telephone number.                                                        \\
-    User \texttt{mustAcknowledged}(Policy)      & \cmark                 & \cmark                  & \cmark              & \cmark            & \cmark
-    & Requires the user to acknowledge a  policy.                                          \\
-    Device \texttt{mustDisable}(Feature)        & \cmark                 & \cmark                  &                     & \cmark            & \cmark
-    & Forces the disablement of a feature (or a device).                                   \\
-    User \texttt{mustInform}(User, Something)   & \cmark                 &                         & \cmark              & \cmark            & \cmark
-    & Forces someone to disclose something to someone.                                     \\
-    Device \texttt{mustWipe}                    & \cmark                 &                         & \cmark              & \cmark            &
-    & Forces a device to be erased.                                                        \\
-    \bottomrule
-  \end{tabular}
-  \caption{Summary of \AppPAL~facts used in multiple BYOD policies.}
-  \label{tab:byod-predicates}
-\end{table}
 
 \subsection{BYOD Idioms}
 \todo{Describe common idioms and patterns found in each of the policies.  Check the earlier draft for some starting work}
-
-\subsubsection{Acknowledgement}
-
-All of the policies looked at require their subjects to be aware and acknowledge certain rules or policies, 
-  or that the company may perform certain actions.
-For example the NHS and HiMSS policies state that the company will wipe devices remotely to protect confidential information if the device is lost.
-Alongside these rules both policies also state that if an employee has personal information on the device then this will be lost also.
-The employee is required to be aware of this, and in the case of the HiMSS policy, agree to hold the company harmless for the loss.
-
-\begin{center}
-  \noindent
-  %\begin{minipage}{0.49\linewidth}
-    \begin{policyrule}{HiMSS}
-      I agree to hold XYZ Health System harmless for any loss relating to the
-      administration of PDA/Smartphone connectivity to XYZ Health System systems
-      including, but not limited to, loss of personal information stored on a
-      PDA/Smartphone due to data deletion done to protect sensitive information
-      related to XYZ Health System, its patients, members or partners.
-      \normalfont
-      \begin{lstlisting}
-'xyz-health-system' says 'user' mustAcknowledged('data-loss-policy').
-      \end{lstlisting}
-    \end{policyrule}
-  %\end{minipage}
-  %\begin{minipage}{0.49\linewidth}
-    \begin{policyrule}{NHS}
-      Individuals who have personal data of any kind stored on a corporately
-      issued mobile device must be aware that in the event of loss of the device
-      the above data wipe will include removal of all personal data.
-      \normalfont
-      \begin{lstlisting}
-'nhs-trust' says Staff:S can-say
-  S hasAcknowledged('data-loss-policy').
-'nhs-trust' says Staff:S mustAcknowledged('data-loss-policy').
-      \end{lstlisting}
-    \end{policyrule}   
-  %\end{minipage}
-\end{center}
-
-Both the SANS and the siren-company policies use acknowledgements to link to other sets of rules that employees should be aware of.
-These policies aren't further specified, and in the case of an acceptable use policy may be hard to enforce automatically.
-
-\begin{policyrule}{SANS}
-  Users MUST agree to the email security/acceptable use policy and eventually to the eCommerce security policy.
-  \begin{lstlisting}
-'company' says Employee:U mustAcknowledged('email-security'). 
-'company' says Employee:U mustAcknowledged('acceptable-use'). 
-'company' says Employee:U mustAcknowledged('ecommerce-security').
-  \end{lstlisting}
-\end{policyrule}
-\begin{policyrule}{Sirens}
-  The employee is expected to use his or her devices in an ethical manner at all times and adhere to the company's acceptable use policy.
-  \begin{lstlisting}
-'department' says Employee:E mustAcknowledged('acceptable-use').
-  \end{lstlisting}
-\end{policyrule}
-
-\todo{Provide a template for what kinds of policy should be implemented like this and template \AppPAL.}
 
 \subsection{Delegation and Roles within Policies}
 
@@ -560,6 +449,84 @@ In the Sirens and SANS policies the IT department maintains a list of what is in
   \label{tab:principals}
   \caption{Principal Speakers from each of the policies examined.}
 \end{table}
+
+\subsubsection{Acknowledgement}
+
+All of the policies looked at require their subjects to be aware and acknowledge certain rules or policies, 
+  or that the company may perform certain actions.
+For example the NHS and HiMSS policies state that the company will wipe devices remotely to protect confidential information if the device is lost.
+Alongside these rules both policies also state that if an employee has personal information on the device then this will be lost also.
+The employee is required to be aware of this, and in the case of the HiMSS policy, agree to hold the company harmless for the loss.
+
+%\begin{center}
+%  \noindent
+%  %\begin{minipage}{0.49\linewidth}
+%    \begin{policyrule}{HiMSS}
+%      I agree to hold XYZ Health System harmless for any loss relating to the
+%      administration of PDA/Smartphone connectivity to XYZ Health System systems
+%      including, but not limited to, loss of personal information stored on a
+%      PDA/Smartphone due to data deletion done to protect sensitive information
+%      related to XYZ Health System, its patients, members or partners.
+%      \normalfont
+%      \begin{lstlisting}
+%'xyz-health-system' says 'user' mustAcknowledged('data-loss-policy').
+%      \end{lstlisting}
+%    \end{policyrule}
+%  %\end{minipage}
+%  %\begin{minipage}{0.49\linewidth}
+%    \begin{policyrule}{NHS}
+%      Individuals who have personal data of any kind stored on a corporately
+%      issued mobile device must be aware that in the event of loss of the device
+%      the above data wipe will include removal of all personal data.
+%      \normalfont
+%      \begin{lstlisting}
+%'nhs-trust' says Staff:S can-say
+%  S hasAcknowledged('data-loss-policy').
+%'nhs-trust' says Staff:S mustAcknowledged('data-loss-policy').
+%      \end{lstlisting}
+%    \end{policyrule}   
+%  %\end{minipage}
+%\end{center}
+
+Both the SANS and the siren-company policies use acknowledgements to link to other sets of rules that employees should be aware of.
+These policies aren't further specified, and in the case of an acceptable use policy may be hard to enforce automatically.
+The SANS policy requires that all employees follow an email security, acceptable use, and an ecomerce-security policy.
+The Sirens policy expects an employee to use their devices in an ethical manner and abide by an acceptable use policy.
+%\begin{policyrule}{SANS}
+%  Users MUST agree to the email security/acceptable use policy and eventually to the eCommerce security policy.
+%  \begin{lstlisting}
+%'company' says Employee:U mustAcknowledged('email-security'). 
+%'company' says Employee:U mustAcknowledged('acceptable-use'). 
+%'company' says Employee:U mustAcknowledged('ecommerce-security').
+%  \end{lstlisting}
+%\end{policyrule}
+%\begin{policyrule}{Sirens}
+%  The employee is expected to use his or her devices in an ethical manner at all times and adhere to the company's acceptable use policy.
+%  \begin{lstlisting}
+%'department' says Employee:E mustAcknowledged('acceptable-use').
+%  \end{lstlisting}
+%\end{policyrule}
+
+Rules of this form are used when there is a (usually separate) document that contains rules employees should be aware of and follow, but which the company may not have a specific set of rules they wish to enforce.
+For instance a company may have an ethical policy that says employees shouldn't use devices for criminal purposes.
+The company isn't interested in, or capable of, defining precisely what is criminal;
+  but they do trust their employees to make the right decision, and they do expect their employees to be aware of the rules.
+
+To implement these in \AppPAL~a policy author creates two rules: 
+  the first stating their employees must have acknowledged the policy,
+  the second delegating the acceptance of the policy to the employee themselves.
+\begin{lstlisting}
+'company' says Employee:E mustAcknowledged('policy').
+'company' says Employee:E can-say
+  E hasAcknowledged('policy').
+\end{lstlisting}
+
+Because \AppPAL's predicates have a predictible naming conventions (\autoref{ssec:changes}), our tooling can also generate additional rules to check if the acknowledgement has been made, and check whether there is anyone to acknowledge the policy. 
+\begin{lstlisting}
+'company' says E hasSatisfiedObligationToMustAcknowledged('policy')
+  if E mustAcknowledged('policy').
+     E hasAcknowledged('policy').
+\end{lstlisting}
 
 \section{Comparison with Existing MDM Software}
 
@@ -618,32 +585,6 @@ Furthermore the \AppPAL~rule is presented in much the same form as the rule in t
   \caption{MaaS360's search interface for devices.}
   \label{fig:maas360search}
 \end{figure}
-
-\section{Related Work}
-\label{sec:related}
-% 1-2 pages
-
-Companies have very little visibility into how their policies are implemented.
-Morrow notes that \emph{``particularly with the BYOD trend IT professionals don't know if anti-virus software is installed or if it it's current''}~\cite{morrow_byod_2012}.
-Even when devices have means to implement policies correctly it is difficult to ensure devices are properly configured when they are not corporately owned~\cite{tokuyoshi_security_2013}.
-Our work aims to address these problem directly: by using formal languages we can link the policy to the implementation.
-
-Armando~\etal~developed BYODroid as a tool for enforcing BYOD policies through a secure marketplace~\cite{armando_enabling_2014}.
-Their tool allows companies to distribute a secure app~store where through a combination of static and dynamic tools they can verify that apps follow fine-grained permission policies.
-Their policies are low level, based on ConSpec~\cite{aktug_conspec_2008}, allowing checks based on the JVM state.
-Using their tool they implemented parts of a policy relating to personal networks, and data management for the NATO Communications and Information Agency~\cite{armando_developing_2016}.
-Their work shows how parts of a BYOD policy can be checked for and enforced using tools.
-A \AppPAL~policy might use BYODroid to ensure that a parts of a policy are enforced (as well as other tools for other parts).
-\AppPAL~makes explicit how the natural language policy is implemented and by which tools.
-
-Costantino~\etal~created a role-based access control scheme for BYOD devices that allowed a company to verify the devices within their network and what servers and services they had access to~\cite{costantino_towards_2013}. The scheme relied on devices having a TPM however to ensure policy violations were reported.
-
-Other work has looked at using app wrapping to enforce more general policies.
-Tools, such as Dr.~Android and Mr.~Hyde~\cite{jeon_dr._2012} and Aurasium~\cite{xu_aurasium:_2012}, have suggested app wrapping as a possible way to enforce policies.
-This has the advantage that the device's underlying OS needn't be modified as the apps can be modified at the source code level.
-Many commercial \ac{MDM} solutions offer app-wrapping as a feature~\cite{_ibm_????,_app_????}, however app wrapping alone without additional analysis is insufficient to enforce policies effectively~\cite{hao_effectiveness_2013}.
-
-
 
 \section{Conclusions}
 \label{sec:conclusions}
