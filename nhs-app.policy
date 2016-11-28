@@ -1,0 +1,25 @@
+'nhs-trust' says Device canInstall(App)
+  if App isInstallable,
+     App isApprovedFor(Device).
+
+'nhs-trust' says App isInstallable
+  if App hasMet('final-app-approval'),
+     App isUsable.
+
+'nhs-trust' says 'igc' can-say App hasMet('final-app-approval').
+'igc' says 'com.microsoft.office' hasMet('final-app-approval').
+
+'nhs-trust' says App isUsable if App hasMet('business-use-case').
+'nhs-trust' says 'mig' can-say App:A hasMet('business-use-case').
+'mig' says 'com.microsoft.office' hasMet('business-use-case').
+
+'nhs-trust' says Employee:Manager can-say
+  App:A isApprovedFor(Device)
+  if Manager isResponsibleFor(Device).
+
+'nhs-trust' says 'bob' isResponsibleFor('alices-device').
+'bob' says 'com.microsoft.office' isApprovedFor('alices-device').
+
+'nhs-trust' says 'com.microsoft.office' isApp.
+'nhs-trust' says 'bob' isEmployee.
+

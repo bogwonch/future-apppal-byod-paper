@@ -190,7 +190,6 @@ These certificates not only act as proof of how the policy was followed but also
 In a company decisions may be delegated to different departments.
 Knowing who made the decision in each department, and whether that was on the basis of policy or a one-off, allows auditors to see what happened when things go wrong, and builds trust that a system is working correctly.
 
-
 \section{The Details}
 \label{sec:details}
 % 5 pages
@@ -220,6 +219,7 @@ Internally, however, they are treated as standard predicates.
 Facts of the \emph{must}-kind represent obligations, actions that should be completed if a particular scenario presents itself.
 For these facts we add a rule to ensure the obligation is performed.
 This rule should be checked periodically to ensure compliance.
+Our implementation contains tooling to generate these rules automatically.
 \begin{lstlisting}
 $\langle\text{speaker}\rangle$ says $\langle\text{subject}\rangle$ hasSatisfiedObligation$\langle\text{Action}\rangle$
   if $\langle\text{subject}\rangle$ must$\langle\text{Action}\rangle$,
@@ -371,7 +371,7 @@ This does not appear to be the case, however.
 As part of selecting the apps an IT department or group may chose to use advanced instrumentation and policies~\cite{armando_enabling_2014}, or they may manually chose apps to form a curated app store as some \ac{MDM} vendors allow.
 But from the perspective of the policy itself it is more important \emph{who} makes the decision rather than \emph{what} they chose, if they have an opinion at all.
 
-\subsection{Worked Examples}
+\subsection{Worked Example}
 
 Using the NHS rules for finding approved apps (\autoref{ssec:byod-policies}) as an example, suppose an employee, \emph{Alice}, wished to get an app, \emph{\ttfamily com.microsoft.office}, approved and installed on their device.
 To do so Alice would have to convince the device that \lstinline{'nhs-trust' says 'alices-phone' canInstall('com.microsoft.office').}
@@ -408,13 +408,18 @@ Alternatively the speaker could refuse to give the statement, either because the
 In this case Alice would have to look for an alternative means to prove the statement or accept that they cannot install the app.
 
 Once all the statements have been collected into an \emph{assertion context}.
-Alice can use a SecPAL inference tool (such as AppPAL~\footnote{https://github.com/apppal/libapppal}) to check the policy has been satisfied.
+Alice can use a SecPAL inference tool (such as AppPAL\footnote{https://github.com/apppal/libapppal}) to check the policy has been satisfied.
+As well as making the decision we can output a proof tree (such as \autoref{fig:proof}).
 
+\begin{figure}\centering
+  \includegraphics[width=\linewidth]{figures/proof.png}
+  \caption{Proof tree for Alice installing her app.}
+  \label{fig:proof}
+\end{figure}
 
 \subsection{BYOD Idioms}
-\todo{Describe common idioms and patterns found in each of the policies.  Check the earlier draft for some starting work}
 
-\subsection{Delegation and Roles within Policies}
+\subsubsection{Delegation and Roles within Policies}
 
 \AppPAL~requires all assertions be made by an explicit speaker.
 When translating the policies the author of the policy is generally used as the speaker of the rule (\autoref{tab:principals}),
@@ -519,13 +524,6 @@ To implement these in \AppPAL~a policy author creates two rules:
 'company' says Employee:E mustAcknowledged('policy').
 'company' says Employee:E can-say
   E hasAcknowledged('policy').
-\end{lstlisting}
-
-Because \AppPAL's predicates have a predictible naming conventions (\autoref{ssec:changes}), our tooling can also generate additional rules to check if the acknowledgement has been made, and check whether there is anyone to acknowledge the policy. 
-\begin{lstlisting}
-'company' says E hasSatisfiedObligationToMustAcknowledged('policy')
-  if E mustAcknowledged('policy').
-     E hasAcknowledged('policy').
 \end{lstlisting}
 
 \section{Comparison with Existing MDM Software}
