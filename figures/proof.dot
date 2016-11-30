@@ -2,21 +2,21 @@ digraph proof {
   graph [fontname = "Latin Modern Mono"];
   node [fontname = "Latin Modern Mono"];
   edge [fontname = "Latin Modern Mono"];
-  node_6 [label="'bob' says 'com.microsoft.office' isApprovedFor('alices-device').\l", shape=underline];
-  node_10 [label="'igc' says 'com.microsoft.office' hasMet('final-app-approval').\l", shape=underline];
-  node_14 [label="'mig' says 'com.microsoft.office' hasMet('business-use-case').\l", shape=underline];
-  node_0 [label="'nhs-trust' says 'alices-device' canInstall('com.microsoft.office')\l  if 'com.microsoft.office' isInstallable,\l    'com.microsoft.office' isApprovedFor('alices-device').\l", shape=underline];
-  node_2 [label="'nhs-trust' says 'bob' can-say\l  'com.microsoft.office' isApprovedFor('alices-device')\l  if Manager isResponsibleFor('alices-device'),\l     A isApp,\l     Manager isEmployee.\l", shape=underline];
-  node_5 [label="'nhs-trust' says 'bob' isEmployee.\l", shape=underline];
-  node_3 [label="'nhs-trust' says 'bob' isResponsibleFor('alices-device').\l", shape=underline];
-  node_12 [label="'nhs-trust' says 'com.microsoft.office' hasMet('business-use-case').\l", shape=underline];
-  node_8 [label="'nhs-trust' says 'com.microsoft.office' hasMet('final-app-approval').\l", shape=underline];
-  node_4 [label="'nhs-trust' says 'com.microsoft.office' isApp.\l", shape=underline];
-  node_1 [label="'nhs-trust' says 'com.microsoft.office' isApprovedFor('alices-device').\l", shape=underline];
-  node_7 [label="'nhs-trust' says 'com.microsoft.office' isInstallable\l  if 'com.microsoft.office' hasMet('final-app-approval'),\l     'com.microsoft.office' isUsable.\l", shape=underline];
-  node_11 [label="'nhs-trust' says 'com.microsoft.office' isUsable\l  if 'com.microsoft.office' hasMet('business-use-case').\l", shape=underline];
-  node_9 [label="'nhs-trust' says 'igc' can-say\l  'com.microsoft.office' hasMet('final-app-approval').\l", shape=underline];
-  node_13 [label="'nhs-trust' says 'mig' can-say\l  'com.microsoft.office' hasMet('business-use-case')\l  if A isApp.\l", shape=underline];
+  node_6 [label="'bob' says\l  'com.microsoft.office' isApprovedFor('alices-device').\l", shape=underline];
+  node_10 [label="'igc' says\l  'com.microsoft.office' hasMet('final-app-approval').\l", shape=underline];
+  node_14 [label="'mig' says\l  'com.microsoft.office' hasMet('business-use-case').\l", shape=underline];
+  node_0 [label="'nhs-trust' says\l  'alices-device' canInstall('com.microsoft.office')\l  if 'com.microsoft.office' isInstallable,\l    'com.microsoft.office' isApprovedFor('alices-device').\l", shape=underline];
+  node_2 [label="'nhs-trust' says\l  'bob' can-say\l  'com.microsoft.office' isApprovedFor('alices-device')\l  if Manager isResponsibleFor('alices-device'),\l     A isApp,\l     Manager isEmployee.\l", shape=underline];
+  node_5 [label="'nhs-trust' says\l  'bob' isEmployee.\l", shape=underline];
+  node_3 [label="'nhs-trust' says\l  'bob' isResponsibleFor('alices-device').\l", shape=underline];
+  node_12 [label="'nhs-trust' says\l  'com.microsoft.office' hasMet('business-use-case').\l", shape=underline];
+  node_8 [label="'nhs-trust' says\l  'com.microsoft.office' hasMet('final-app-approval').\l", shape=underline];
+  node_4 [label="'nhs-trust' says\l  'com.microsoft.office' isApp.\l", shape=underline];
+  node_1 [label="'nhs-trust' says\l  'com.microsoft.office' isApprovedFor('alices-device').\l", shape=underline];
+  node_7 [label="'nhs-trust' says\l  'com.microsoft.office' isInstallable\l  if 'com.microsoft.office' hasMet('final-app-approval'),\l     'com.microsoft.office' isUsable.\l", shape=underline];
+  node_11 [label="'nhs-trust' says\l  'com.microsoft.office' isUsable\l  if 'com.microsoft.office' hasMet('business-use-case').\l", shape=underline];
+  node_9 [label="'nhs-trust' says\l  'igc' can-say\l  'com.microsoft.office' hasMet('final-app-approval').\l", shape=underline];
+  node_13 [label="'nhs-trust' says\l  'mig' can-say\l  'com.microsoft.office' hasMet('business-use-case')\l  if A isApp.\l", shape=underline];
   proof_0 [shape=point]
   proof_1 [shape=point]
   proof_2 [shape=point]
