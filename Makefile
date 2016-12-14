@@ -1,9 +1,12 @@
 
-all: paper.pdf
+all: paper.pdf | tidy
 view: paper.pdf
 	qvm-open-in-dvm paper.pdf &
 %.pdf: %.tex
 	latexmk -pdf ${<}
+
+tidy:
+	latexmk -c
 
 clean:
 	latexmk -C
