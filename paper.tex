@@ -26,6 +26,8 @@
 \acrodef{HiMSS}{Healthcare Information Management System Society}
 \acrodef{GSN}{Goal Structuring Notation}
 
+\usepackage{enumitem}
+
 \usepackage{listings}
 \lstdefinelanguage{AppPAL}{%
   morekeywords={if,inf,says,where,true,false,with,is},
@@ -82,9 +84,9 @@
 \begin{abstract}
   % 4 Sentences
   BYOD policies are informally specified using natural language.
-  We show how the \AppPAL~language can help reduce ambiguity in BYOD policies and link the specification of a BYOD policy to its implementation.
-  This paper identifies a BYOD idiom that is ignored by existing MDM tools.
-  We explore the delegation relationships and concerns in 5 BYOD policies, and describe how \AppPAL might be used to implement them using existing tools.
+  We show how the \AppPAL~language can help reduce ambiguity in 5 BYOD policies and link the specification of a BYOD policy to its implementation.
+  Using a formalisation of the 5 policies written in \AppPAL, we make comparisons between them, and explore the delegation relationships within them.
+  We identify that whilst policy acknowledgement is a key part of all 5 policies, they are not managed by existing MDM tools.
 \end{abstract}
 \section{Introduction}
 \label{sec:intro}
@@ -93,79 +95,77 @@
 % 1 page
 
 Employees bring their own devices to work.
-In the past employees might have had a dedicated company device.
-Today around 70\% of companies have a BYOD scheme~\cite{schulze_byod_2016} and, in some fields,
-  85\% of staff use their personal devices to look up work-sensitive information~\cite{patel_uk_2015}.
+In the past employees might have had a dedicated company device; 
+  but today around 70\% of companies have a BYOD scheme~\cite{schulze_byod_2016}. 
+In some fields, 85\% of staff use their personal devices to look up work-sensitive information~\cite{patel_uk_2015}.
 Controlling employee's devices is a challenge for IT departments.
-Failure to do so can lead to cause employees to leak confidential information and the waste of company resources.
-Unfortunately the companies have limited control over the devices used to access them.
+Failure to manage devices can lead to employees accidentally leaking confidential information and the waste of company resources.
+Unfortunately the companies have limited control over the devices inside their networks if they do not own them.
 
-One solution to controlling devices is to require users to agree to follow policies.
-They often take the form of a user agreement, written in natural language, which describes how the devices should be used and configured.
-Various guides are available for companies wishing to implement a policy from governments, standards bodies, and organizations seeking to advise~\cite{nicholas_r._c._guerin_security_2008,souppaya_guidelines_????,hp_byod_????,cesg_byod_2015}.
+One solution to controlling devices is requiring users agree to follow policies.
+They often take the form of a user agreement, written in natural language, which describes how devices should be used and configured.
+Various guides are available for companies wishing to implement a policy from governments, standards bodies, and organizations seeking to advise~\cite{nicholas_r._c._guerin_security_2008,souppaya_guidelines_????,cesg_byod_2015}.
 On top of user agreements, companies may also use \ac{MDM} software which can help enforce policies.
-\ac{MDM} software can configure a device's security settings, and add 
+\ac{MDM} software can configure a device's security settings, and add provide security APIs.
 But the use of \ac{MDM} software does not guarantee compliance.
-One survey from a leading MDM vendor found over 50\% of companies with their \ac{MDM} software still had devices that do not comply with their policies~\cite{mobileiron_security_labs_q4_2015}.
+One survey from a leading MDM vendor found over 50\% of companies with their \ac{MDM} software still had devices that did not comply with their policies~\cite{mobileiron_security_labs_q4_2015}.
 Reasons for non-compliance included out-of-date policies and employees tampering with the \ac{MDM} software.
 
 BYOD policies are becoming more intricate.
-There has been much work looking at developing the \ac{MDM} software to enforce aspects of BYOD policies~\cite{costantino_towards_2013,martinelli_enhancing_2016,armando_enabling_2014}.
+Prior work has looked at developing \ac{MDM} software to enforce aspects of BYOD policies~\cite{costantino_towards_2013,martinelli_enhancing_2016,armando_enabling_2014}.
 Implementing a policy is only part of the problem, however.
 BYOD policies are specified informally using natural language, and they contain more than just access control decisions.
 These policies describe trust relationships inside the company between the IT departments, users, and HR each who may be delegated to make decisions and provide rules.
 Policies contain rules that require employees to acknowledge risks, and regulations.
 An antivirus or \ac{MDM} program may be used to \emph{implement} part of the policy.
-But it is the policy, however, that \emph{specifies} which software to use and when. 
+But it is the policy that \emph{specifies} which software to use and when. 
 There is no automatic way to check how the policy has been implemented and by what.
-
-To describe the policies we came up with \AppPAL{}: 
-  a formal language for linking policies to the tools used to implement them and distributing decisions about apps.
-Using a formalization of five BYOD policies written using \AppPAL~we identify different idioms and common delegation patterns present in BYOD policies.
-Our formalizations pick out the common concerns and trust relationships in these policies.
-We look at what decisions and trust relationships used in BYOD policies.
-These are BYOD idioms that are capture decisions and frequently seen requirements in BYOD policies.
-These give a guide for where future work implementing BYOD tools should focus their efforts to cover more aspects of policies.
 
 Companies lack visibility as to how they implement their policies.
 When considering what tools a company may use Morrow notes \emph{``particularly with the BYOD trend IT professionals do not know if anti-virus software is installed or if it's current''}~\cite{morrow_byod_2012}.
-Even when devices can implement policies correctly, it is hard to properly configure devices that are not owned by the company~\cite{tokuyoshi_security_2013}.
+Even when devices can implement policies correctly, it is hard to configure devices that are not owned by the company~\cite{tokuyoshi_security_2013}.
 Our work aims to address these problems directly: by using formal languages we can link the policy to the implementation.
+
+To describe the policies we came up with \AppPAL{}: 
+  a formal language for linking policies to the tools used to implement them and distributing decisions.
+Using a formalization of five BYOD policies written using \AppPAL~we identify different idioms and common delegation patterns present in BYOD policies.
+Our formalizations pick out the common concerns and trust relationships in these policies.
+We look at what decisions and trust relationships used in BYOD policies.
+We identify BYOD idioms that capture frequently seen decisions in BYOD policies.
+These give a guide for where future work implementing BYOD tools should focus their efforts to cover more aspects of policies.
 
 \AppPAL~is not designed to replace existing static and dynamic analysis and enforcement tools.
 A company might use multiple different tools, app stores, and even contractual agreements with employees to enforce their policies.
 We aim to help clarify the meaning of ambiguous natural language policy documents, and provide a rigorous means for following them.
 A company can use any \ac{MDM} tool, curated app store or user agreement to enforce their policy.
-\AppPAL~links the specification of the policy to its implementation, giving visibility into exactly how a policy is implemented and satisfied.
+\AppPAL~links the specification of the policy to its implementation, showing exactly how a policy is implemented and giving a rigorous means to enforce it.
 
-We show how \AppPAL~can be used to implement these policies and describe precisely the different trust relationships.
+We show how \AppPAL~can be used to encode these policies and describe precisely the different trust relationships.
 \AppPAL~is an instantiation of the SecPAL authorization language~\cite{becker_secpal:_2010} for mobile device policies and implemented atop of AppPAL~\cite{hallett_apppal_2016}.
-We have found, however, that SecPAL is a useful tool for describing other policies surround the mobile ecosystem as well~\cite{hallett_specifying_2016}.
-Our AppPAL implementation can also be easily extended to support new types of policies.
-It also gives us access to tooling we have developed to can check AppPAL policies for completeness and redundant statements.
-For this work additional tooling was developed to help visualise policies and describe policies contents.
+We have found, however, that SecPAL is a useful tool for describing other policies surrounding mobile ecosystems~\cite{hallett_specifying_2016}.
+Our AppPAL implementation can be easily extended to support new types of policies.
+It also gives us access to tooling we have developed to check AppPAL policies for completeness and redundant statements.
+For this work additional tooling was developed to help visualise policies and describe their contents.
 This was helpful for making comparisons between policies and checking our formalisation for mistakes. 
 
 %\paragraph{Contributions}
 
 In summary, our work makes the following contributions:
-
-\begin{itemize}
+\begin{itemize}[topsep=0pt]
   \item We present a formalisation of five different BYOD policies in \AppPAL: a new instantiation of SecPAL for describing BYOD policies (\autoref{sec:idea}).
   \item Using our formalisation of the policies we make comparisons between the different policies. 
     Unlike previous work which looks at individual policies~\cite{armando_developing_2016}, our work looks at policies across a variety of domains (\autoref{ssec:byod-policies}).
   \item We identify that delegation and acknowledgements are an important aspect of BYOD policies that current MDM software does not look at (\autoref{sec:idioms}).
 \end{itemize}
 
-
 \subsection{Related Work}
 \label{sec:related}
 % 1-2 pages
 
-Martinelli~\etal{}'s looks at creating a dynamic permissions manager, called UC-Droid.
+Martinelli~\etal{}'s work looks at creating a dynamic permissions manager, called UC-Droid.
 Their tool can alter what an app's Android permissions are at run time based on policies~\cite{martinelli_enhancing_2016}.
-The tool allows companies to reconfigure the apps depending on whether the employee is at work, in a secret lab, or working out-of-hours.
-These kinds of policies are more configurable than the geofenced based policies existing MDM packages provide.
+The tool allows companies to reconfigure their apps depending on whether the employee is at work, in a secret lab, or working out-of-hours.
+These kinds of policies are more configurable than the geofenced based policies some \ac{MDM} tools provide.
 Other work has looked at enforcing different policies based on what roles an employee holds~\cite{costantino_towards_2013}.
 The work allowed a company to verify the devices within their network and what servers and services they could access.
 It also describes a mechanism for providing different users with different policies.
@@ -173,7 +173,7 @@ It also describes a mechanism for providing different users with different polic
 Armando~\etal~developed BYODroid as a tool for enforcing BYOD policies through a secure marketplace~\cite{armando_bring_2013}.
 Their tool allows companies to distribute apps through a secure app~store~\cite{armando_enabling_2014}.
 The store ensures apps meet policies through a combination of static analysis and app rewriting with dynamic enforcement.
-Their policies are low level, based on ConSpec~\cite{aktug_conspec_2008}, allowing checks based on the JVM state.
+Their policies are low level, based on ConSpec~\cite{aktug_conspec_2008}, allowing checks based on Dalvik VM's state.
 Using their tool, they implemented parts of a NATO Communications and Information Agency policy relating to personal networks and data management~\cite{armando_developing_2016}.
 Their work shows how the app-specific sections of a BYOD policy can be check and enforced using tools.
 They did not look at where the checks or policies come from, however.
@@ -184,24 +184,23 @@ We can delegate to other marketplaces to decide if an app meets different parts 
 We can even create new stores by composing their policies and using multiple store's statements about the apps.
 Distributing checks like this is useful when using some static analysis tools which can take a long time to run (e.g.~TaintDroid~\cite{enck_taintdroid:_2014}).
 
-Other work has looked at using app wrapping (where an app is recompiled to use guarded APIs) to enforce more general policies.
-Tools, such as Dr.~Android and Mr.~Hyde~\cite{jeon_dr._2012} and Aurasium~\cite{xu_aurasium:_2012}, have suggested app wrapping as a possible way to enforce policies.
+Tools, such as Dr.~Android and Mr.~Hyde~\cite{jeon_dr._2012} and Aurasium~\cite{xu_aurasium:_2012}, have suggested app wrapping (where an app is recompiled to use guarded APIs) as a possible way to enforce policies.
 App rewriting has the advantage that the device's underlying OS needn't be modified as the apps are changed at the source code level.
 However app wrapping alone without additional analysis is insufficient to enforce policies effectively~\cite{hao_effectiveness_2013}.
 
 Our approach taken with \AppPAL~is similar to work on safety cases.
 A safety case is an argument made to say a system is acceptably safe to be used in a given scenario.
 Industrial safety cases are often described in natural language, which can be ambiguous and unclear.
-\ac{GSN}~\cite{tim_kelly_goal_2004} is one approach to make the safety cases explicit.
-It is a graphical formal notation that lets engineers argue that a system is safe by linking top-level goals, to sub-goals to the arguments made for a system's safety.
-Similarly work developing a formal language for specifying how medical staff should collaborate in a healthcare scenario~\cite{papapanagiotou_formal_2014} again helps clarify how roles are filled in a medical context, on the basis of staff and different healthcare providers.
+\ac{GSN}~\cite{kelly_goal_2004} is one approach to make the safety cases explicit.
+It is a graphical formal notation that lets engineers argue that a system is safe by linking safety goals to the arguments made for a system's safety.
+Similarly, work developing a formal language for specifying how medical staff should collaborate in a healthcare scenario~\cite{papapanagiotou_formal_2014} again helps clarify how roles are filled in a medical context on the basis of staff and different healthcare providers.
 
-It is interesting to examine how leading~\cite{rob_smith_magic_2016} MDM~tools such as IBM's MaaS360, MobileIron and \ac{BES}, enforce \emph{BYOD} policies.
-Each of these tools supports enforcing and checking compliance policies. 
+It is interesting to examine how leading~\cite{rob_smith_magic_2016} MDM~tools such as IBM's MaaS360, or \ac{BES}, enforce \emph{BYOD} policies.
+These tools support enforcing and checking compliance policies. 
 They do not, however, use policy languages to specify policies; rather they provide a limited number of checkboxes that admins can tweak (an excerpt of a policy from MaaS360 is shown in \autoref{fig:maaspolicy}).
 These tools allow administrators to configure a device's settings and provision the devices with company apps.
 Some support app wrapping, which enables them to encrypt app data locally, use a VPN within the app, or prevent apps not being used when the device isn't compliant.
-Because the policies are inflexible and tightly coupled to the device's OS, intervention by an administrator is often required.
+But because the policies are inflexible and tightly coupled to the device's OS, intervention by an administrator is often required.
 Whilst MDM software is good at configuring devices, selecting which policies to apply is typically a manual process performed by an administrator.
 Removing blacklisted apps is a common feature, but the selection process of which apps to remove is manual.
 
@@ -215,7 +214,7 @@ Removing blacklisted apps is a common feature, but the selection process of whic
 \label{sec:idea}
 % 2 pages
 
-As mobile devices have become more common in the workplace, BYOD policies have been written to help control the devices.
+As mobile devices have become more common in the workplace, BYOD policies have been written to help control them.
 Part of their policies are prescriptive:  if you configure your device in this way, you will mitigate that threat.
 The policies contain more than just configuration, however.
 Consider this rule taken from the \emph{Security Policy for the use of handheld devices in corporate environments} by SANS~\cite{nicholas_r._c._guerin_security_2008}.
@@ -229,10 +228,11 @@ Consider this rule taken from the \emph{Security Policy for the use of handheld 
   Furthermore, MMS messages should be disabled as well, to prevent malicious users from sending proprietary pictures.
 \end{policyrule}
 
-A company could make use of an \ac{MDM} program.
-Some can use geofencing to apply a policies in the area around a lab.
+A company could use an \ac{MDM} program to enforce this.
+Some \ac{MDM} tools can use geofencing to apply a policies in the area around a lab.
 Techniques like this would implement the recommendation within the rule, but the rule itself contains more than just configuration.
-It talks of \emph{restricted environments} decided by \emph{company risk analysis}; but how is this communicated to the device?
+It talks of \emph{restricted environments} decided by \emph{company risk analysis}.
+How is this communicated to the device?
 Does it access the list of restricted environments once from a server, are they fixed or can a device decide them for itself?
 Can it judge using a policy if a location is restricted?
 The rule also gives a security objective: \emph{prevent malicious users from sending proprietary pictures}.
@@ -247,7 +247,7 @@ We capture the goals of the policy rules so that the delegations of trust, tools
 This gives us greater clarity as to which tool is being trusted to implement what policy.
 It allows us to see who is being trusted to make which decisions,
   and use automatic-tools to uncover problematic aspects of the policy~\cite{hallett_specifying_2016}.
-Continuing with the example above, we can write this in \AppPAL~as:
+Continuing with the example above, we can encode this in \AppPAL~as:
 
 \begin{lstlisting}
 'company' says 'risk-analyst' can-say
@@ -266,7 +266,7 @@ Continuing with the example above, we can write this in \AppPAL~as:
      Location isHighSecurityFacility.
 \end{lstlisting}
 
-After checking a policy written in \AppPAL, we generate a proof tree that shows how the policy was satisfied.
+After checking the policy we generate a proof tree that shows how the policy was satisfied.
 These proof trees not only show how the policy was followed but also provide an audit trail.
 In a company decisions may be delegated to different departments.
 Auditors can see what happened when things go wrong.
@@ -280,7 +280,7 @@ They know who made what decision, and whether they made it through following pol
 \label{ssec:changes}
 
 SecPAL was developed as a distributed access control language~\cite{becker_secpal:_2010}.
-The SecPAL language is designed to be have a clear readable syntax, and intuitive semantics.
+It is designed to be have a clear readable syntax, and intuitive semantics.
 It is also designed to be extensible, which makes it ideal for extending to create new languages.
 All SecPAL statements are \emph{said} by an explicit authority.
 The authority can say a fact (that something is described by a predicate), a delegation (that someone else \emph{can-say} a fact), or a role assignment (that something \emph{can-act-as} something else).
@@ -401,7 +401,7 @@ The \emph{policy coverage} represents the number of rules that have an \AppPAL~d
 %Table~\ref{tab:byod-predicates} summarises the facts used by multiple policies.
 %This shows what concerns and controls and are shared between different BYOD policies.
 All five of the policies make use of acknowledgements.
-The use of acknowledgements could be because enforcing the rules in a policy through technical means is undesirable. 
+The use of an acknowledgements could be because enforcing that rule in a policy through technical means is undesirable. 
 It could indicate policy authors care more that the subjects are aware of the rules than they do for rigorous enforcement.
 All but the \ac{HiMSS} policy have rules that include locking down a device by disabling features.
 All but the Edinburgh policy have rules that look at what should happen if a user loses their device.
@@ -447,7 +447,6 @@ Apps have to be approved by three different groups (the IGC, the Employee's mana
   Use of paid apps must be agreed in advance with the device holder's line
   manager and there should be a demonstrable benefit.
   \normalfont
-  \vspace{1em} 
   \begin{lstlisting}
 'nhs-trust' says App isUsable if App hasMet('clinical-use-case').
 'nhs-trust' says App isUsable if App hasMet('business-use-case').
@@ -514,8 +513,8 @@ In this case, Alice would have to look for an alternative means to prove the sta
 
 When the statements have been collected 
   Alice can use a SecPAL inference tool (such as AppPAL\footnote{https://github.com/apppal/libapppal}) to check the policy has been satisfied.
-As well as making the decision we can output a proof tree.% (such as \autoref{fig:proof}).
-The generated proof lets auditors review how any decision was made, and verify the decision-making process.
+%As well as making the decision we can output a proof tree.% (such as \autoref{fig:proof}).
+The generated proof from the tool lets auditors review how the decision was made, and verify the decision-making process.
 
 %% We do not have room for this
 %\begin{figure}\centering
@@ -527,7 +526,7 @@ The generated proof lets auditors review how any decision was made, and verify t
 \section{BYOD Idioms}
 \label{sec:idioms}
 
-When examining the policies, we noticed two particular idioms reappearing: acknowledgements and delegation.
+When examining the policies, we noticed two particular idioms in many policies: acknowledgements and delegation.
 We describe both idioms in greater detail, and show how they can be implemented in \AppPAL{}, below.
 MDM tools and research have focussed so far on implementing restrictions on apps and devices~\cite{_ibm_????,armando_formal_2014,martinelli_enhancing_2016}.
 Implementing these controls is a vital aspect of BYOD policies and all 5 of the policies we looked at had rules that described restrictions~(\autoref{tab:summary}).
@@ -594,8 +593,8 @@ If we wish to delegate to someone, we can add conditionals to the can-say statem
 
 \subsubsection{Acknowledgement.}
 
-All the policies looked at require their subjects to be aware and acknowledge certain rules or policies, 
-  or that the company may perform certain actions.
+All the policies we looked at require their subjects to be aware and acknowledge certain rules or policies, 
+  and that the company may perform certain actions.
 For example, the NHS and \ac{HiMSS} policies state that the organisation will wipe devices remotely to protect confidential information a user loses their device.
 Both policies also say that employees would lose personal information if they had it on the device and the company needed to erase it.
 The employee is required to be aware of this, and in the case of the \ac{HiMSS} policy, agree to hold the company harmless for the loss.
@@ -747,9 +746,11 @@ Future work will aim to further explore how these acknowledgements are used with
 
 Related systems, such as \ac{GSN} described in \autoref{sec:related}, use a graphical notation.
 Whilst SecPAL-based languages are designed to be readable, diagrams can help make authors write policies and auditors understand them.
-Future work will look at extending SecPAL's notation to create such diagrams.
+Future work will look at extending SecPAL's notation to create such diagrams and further aid readability.
+
 
 %\bibliographystyle{plain}
+\newpage
 \printbibliography
 
 \end{document}
