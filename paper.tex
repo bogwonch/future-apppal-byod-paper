@@ -6,7 +6,7 @@
 \usepackage{booktabs}
 \usepackage{graphicx}
 \usepackage{tablefootnote}
-\usepackage[backend=bibtex,firstinits=true]{biblatex}
+\usepackage[backend=bibtex,firstinits=true,sorting=none]{biblatex}
 \addbibresource{paper.bib}
 \makeatletter
 \def\blx@maxline{77}
@@ -77,7 +77,7 @@
 }
 
 \title{Capturing Policies for BYOD}
-\author{Joseph Hallett and David Aspinall}
+\author{Joseph Hallett\thanks{Work supported by EPSRC App Guarden grant (EP/K032666/1); and the Alan Turing Institute.} and David Aspinall}
 \institute{School of Informatics, University of Edinburgh}
 \begin{document}
 \maketitle
@@ -191,7 +191,7 @@ However app wrapping alone without additional analysis is insufficient to enforc
 Our approach taken with \AppPAL~is similar to work on safety cases.
 A safety case is an argument made to say a system is acceptably safe to be used in a given scenario.
 Industrial safety cases are often described in natural language, which can be ambiguous and unclear.
-\ac{GSN}~\cite{kelly_goal_2004} is one approach to make the safety cases explicit.
+\ac{GSN}~\cite{tim_kelly_goal_2004} is one approach to make the safety cases explicit.
 It is a graphical formal notation that lets engineers argue that a system is safe by linking safety goals to the arguments made for a system's safety.
 Similarly, work developing a formal language for specifying how medical staff should collaborate in a healthcare scenario~\cite{papapanagiotou_formal_2014} again helps clarify how roles are filled in a medical context on the basis of staff and different healthcare providers.
 
