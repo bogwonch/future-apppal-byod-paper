@@ -102,11 +102,11 @@ Controlling employee's devices is a challenge for IT departments.
 Failure to manage devices can lead to employees accidentally leaking confidential information and the waste of company resources.
 Unfortunately the companies have limited control over the devices inside their networks if they do not own them.
 
-One solution to controlling devices is requiring users agree to follow policies.
+One solution to controlling devices is requiring users follow policies.
 They often take the form of a user agreement, written in natural language, which describes how devices should be used and configured.
 Various guides are available for companies wishing to implement a policy from governments, standards bodies, and organizations seeking to advise~\cite{nicholas_r._c._guerin_security_2008,souppaya_guidelines_????,cesg_byod_2015}.
 On top of user agreements, companies may also use \ac{MDM} software which can help enforce policies.
-\ac{MDM} software can configure a device's security settings, and add provide security APIs.
+\ac{MDM} software can configure a device's security settings, and add security APIs.
 But the use of \ac{MDM} software does not guarantee compliance.
 One survey from a leading MDM vendor found over 50\% of companies with their \ac{MDM} software still had devices that did not comply with their policies~\cite{mobileiron_security_labs_q4_2015}.
 Reasons for non-compliance included out-of-date policies and employees tampering with the \ac{MDM} software.
@@ -130,19 +130,19 @@ To describe the policies we came up with \AppPAL{}:
   a formal language for linking policies to the tools used to implement them and distributing decisions.
 Using a formalization of five BYOD policies written using \AppPAL~we identify different idioms and common delegation patterns present in BYOD policies.
 Our formalizations pick out the common concerns and trust relationships in these policies.
-We look at what decisions and trust relationships used in BYOD policies.
+We look at what decisions and trust relationships are used in BYOD policies.
 We identify BYOD idioms that capture frequently seen decisions in BYOD policies.
 These give a guide for where future work implementing BYOD tools should focus their efforts to cover more aspects of policies.
 
 \AppPAL~is not designed to replace existing static and dynamic analysis and enforcement tools.
-A company might use multiple different tools, app stores, and even contractual agreements with employees to enforce their policies.
+A company might use multiple tools, app stores, and even contractual agreements with employees to enforce their policies.
 We aim to help clarify the meaning of ambiguous natural language policy documents, and provide a rigorous means for following them.
 A company can use any \ac{MDM} tool, curated app store or user agreement to enforce their policy.
 \AppPAL~links the specification of the policy to its implementation, showing exactly how a policy is implemented and giving a rigorous means to enforce it.
 
 We show how \AppPAL~can be used to encode these policies and describe precisely the different trust relationships.
 \AppPAL~is an instantiation of the SecPAL authorization language~\cite{becker_secpal:_2010} for mobile device policies and implemented atop of AppPAL~\cite{hallett_apppal_2016}.
-We have found, however, that SecPAL is a useful tool for describing other policies surrounding mobile ecosystems~\cite{hallett_specifying_2016}.
+SecPAL is also a useful tool for describing other policies surrounding mobile ecosystems~\cite{hallett_specifying_2016}.
 Our AppPAL implementation can be easily extended to support new types of policies.
 It also gives us access to tooling we have developed to check AppPAL policies for completeness and redundant statements.
 For this work additional tooling was developed to help visualise policies and describe their contents.
@@ -368,7 +368,7 @@ The policy is designed as a sample agreement for a system trying to manage perso
       \midrule
       Number of rules                 & 33           & 15          & 56          & 20                                & 25          \\
       \AppPAL~statements              & 71           & 21          & 58          & 10                                & 39          \\
-      Policy coverage                 & 33 (100$\%$) & 14 (93$\%$) & 40 (71$\%$) & 10 (100\%)\tablefootnote{The Edindiburgh policy contains a large nmuber of rules that whilst marked as rules are infact just descriptions of the document.  All the policy rules that described restrictions or relationships were implemented in \AppPAL{}.} & 22 (88$\%$) \\
+      Policy coverage                 & 33 (100$\%$) & 14 (93$\%$) & 40 (71$\%$) & 10 (100\%)\tablefootnote{The Edindiburgh policy contains a large number of rules that whilst marked as such are infact just descriptions of the document.  All the policy rules that described restrictions or relationships were implemented in \AppPAL{}.} & 22 (88$\%$) \\
       \midrule
       Rules using Acknowledgement     & 2            & 10          & 11          & 1                                 & 6           \\
       Rules using Delegation          & 23           & 5           & 33          & 2                                 & 13          \\
@@ -649,8 +649,8 @@ The Sirens policy expects an employee to use their devices ethically and abide b
 %\end{policyrule}
 
 When there is a (usually separate) set of rules and concerns employees should be aware of acknowledgements are used.
-The company may not have wish to enforce these separate rules automatically, however.
-For instance, a company may have an ethical policy that says employees should not use devices for criminal purposes.
+The company may not wish to enforce these separate rules automatically, however.
+For instance, a company may have an ethics policy that says employees should not use devices for criminal purposes.
 The company is not interested in, or capable of, defining what is criminal.
 They trust their employees to make the right decision and to be aware of the rules.
 
