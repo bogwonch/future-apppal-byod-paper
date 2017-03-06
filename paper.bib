@@ -378,6 +378,8 @@ Based on the author’s international engagement in EHR architecture and securit
 	institution = {LinkedIn Information Security},
 	author = {Schulze, Holger},
 	year = {2016},
+  url = {{http://static.tenable.com/whitepapers/byod-and-mobile-security-report-2016.pdf}},
+  volume = {4.2},
 	file = {BYOD-and-Mobile-Security-Report-2016-01.pdf:/Users/bogwonch/Library/Application Support/Zotero/Profiles/3fc04s7l.default/zotero/storage/5IVJT93R/BYOD-and-Mobile-Security-Report-2016-01.pdf:application/pdf}
 }
 
@@ -588,7 +590,8 @@ DOI: 10.1007/978-3-642-28166-2\_7},
 
 @article{tokuyoshi_security_2013,
 	title = {The security implications of {BYOD}},
-	volume = {2013},
+	volume = {2013.4},
+  pages = {{12--13}},
 	abstract = {Take a second to picture the carefully groomed, meticulously chosen set of policies that govern the selection, purchase, use and audit of technology inside the average business. Now picture those guidelines being thrown out the window.
 
 Bring Your Own Device (BYOD) incorporates new devices into the enterprise outside of the process that IT normally follows for vetting, monitoring and auditing equipment for proper use. And it allows employees to dictate the technology they want to use.
@@ -879,11 +882,6 @@ via several example applications.},
 	address = {New York, NY, USA},
 	series = {{SAC} '13},
 	title = {Bring {Your} {Own} {Device}, {Securely}},
-	isbn = {978-1-4503-1656-9},
-	url = {http://doi.acm.org/10.1145/2480362.2480707},
-	doi = {10.1145/2480362.2480707},
-	abstract = {Modern mobile devices offer users powerful computational capabilities and complete customization. As a matter of fact, today smartphones and tablets have remarkable hardware profiles and a cornucopia of applications. Yet, the security mechanisms offered by most popular mobile operating systems offer only limited protection to the threats posed by malicious applications that may be inadvertently installed by the users and therefore they do not meet the security standards required in corporate environments. In this paper we propose a security framework for mobile devices that ensures that only applications complying with the organization security policy can be installed. This is done by inferring behavioral models from applications and by validating them against the security policy. We also present BYODroid, a prototype implementation of our proposed security framework for the Android OS.},
-	urldate = {2016-06-16},
 	booktitle = {Proceedings of the 28th {Annual} {ACM} {Symposium} on {Applied} {Computing}},
 	publisher = {ACM},
 	author = {Armando, Alessandro and Costa, Gabriele and Merlo, Alessio},
@@ -1035,11 +1033,10 @@ Given the desire of workers to bring the devices they use at home into the workp
 
 @inproceedings{armando_enabling_2014,
 	title = {Enabling {BYOD} through secure meta-market},
-	abstract = {Mobile security is a hot research topic. Yet most of available techniques focus on securing individual applications and therefore cannot possibly tackle security weaknesses stemming from the...},
 	author = {Armando, Alessandro and Costa, Gabriele and Merlo, Alessio and Verderame, Luca},
+  booktitle = {{ACM conference on Security and Privacy in wireless \& mobile networks}},
 	month = aug,
 	year = {2014},
-	file = {Full Text PDF:/Users/bogwonch/Library/Application Support/Zotero/Profiles/3fc04s7l.default/zotero/storage/JAPUS7NH/Armando et al. - 2014 - Enabling BYOD through secure meta-market.pdf:application/pdf;Snapshot:/Users/bogwonch/Library/Application Support/Zotero/Profiles/3fc04s7l.default/zotero/storage/SHEK54MH/Armando et al. - 2014 - Enabling BYOD through secure meta-market.html:text/html}
 }
 
 @inproceedings{martinelli_enhancing_2016,
@@ -1180,6 +1177,7 @@ Given the desire of workers to bring the devices they use at home into the workp
 @inproceedings{xu_aurasium:_2012,
 	title = {Aurasium: {Practical} {Policy} {Enforcement} for {Android} {Applications}},
 	shorttitle = {Aurasium},
+  booktitle = {{Usenix Security Symposium}},
 	author = {Xu, Rubin and Saïdi, Hassen and Anderson, Ross},
 	year = {2012},
 	file = {Full Text PDF:/Users/bogwonch/Library/Application Support/Zotero/Profiles/3fc04s7l.default/zotero/storage/W25PEZJS/Xu et al. - 2012 - Aurasium Practical Policy Enforcement for Android.pdf:application/pdf;Snapshot:/Users/bogwonch/Library/Application Support/Zotero/Profiles/3fc04s7l.default/zotero/storage/STVAC87Z/xu_rubin.html:text/html}
@@ -1326,7 +1324,7 @@ Given the desire of workers to bring the devices they use at home into the workp
 @article{hao_effectiveness_2013,
 	title = {On the effectiveness of {API}-level access control using bytecode rewriting in {Android}},
 	abstract = {Bytecode rewriting on Android applications has been widely adopted to implement fine-grained access control. It endows more flexibility and convenience without modifying the Android platform. Bytecode rewriting uses static analysis to identify the usage of security-sensitive API methods, before it instruments the bytecode to control the access to these API calls. Due to the significance of this technique, the effectiveness of its performance in providing fine-grained access control is crucial. We have provided a systematic evaluation to assess the effectiveness of API-level access control using bytecode rewriting on Android Operating System. In our evaluation, we have identified a number of potential attacks targeted at incomplete implementations of bytecode rewriting on Android OS, which can be applied to bypass access control imposed by bytecode rewriter. These attacks can either bypass the API-level access control or make such access control difficult to implement, exposing weak links in the bytecode rewriting process. Recommendations on engineering secure bytecode rewriting tools are presented based on the identified attacks. This work is the first systematic study on the effectiveness of using bytecode rewriting for API-level access control.},
-	journal = {ASIA CCS},
+	journal = {ACM Asia Conference on Computer and Communications Security},
 	author = {Hao, Hao and Singh, Vicky and Du, Wenliang},
 	year = {2013},
 	file = {Hao et al. - 2013 - On the effectiveness of API-level access control u.pdf:/Users/bogwonch/Library/Application Support/Zotero/Profiles/3fc04s7l.default/zotero/storage/UJ87SMZB/Hao et al. - 2013 - On the effectiveness of API-level access control u.pdf:application/pdf}
@@ -1627,9 +1625,7 @@ In this paper, we present SCANDAL, a sound and automatic static analyzer for det
 @techreport{becker_framework_2009,
 	type = {Technical {Report}},
 	title = {A {Framework} for {Privacy} {Preferences} and {Data}-{Handling} {Policies}},
-	abstract = {This paper presents SecPALP, a language for specifying both users' preferences on how their personally identifiable information (PII) should be treated by data-collecting services, and services'...},
-	number = {MSR–TR–2009–128},
-	urldate = {2016-10-10},
+	number = {{MSR–TR–2009–128}},
 	institution = {Microsoft Research},
 	author = {Becker, Moritz Y. and Malkis, Alexander and Bussard, Laurent},
 	year = {2009},
@@ -1638,9 +1634,8 @@ In this paper, we present SCANDAL, a sound and automatic static analyzer for det
 
 @misc{_ibm_????,
 	title = {{IBM} {MaaS}360 - {Enterprise} {Mobility} {Management} ({EMM})},
-	url = {http://www-03.ibm.com/security/mobile/maas360.html},
+	url = {\url{http://www-03.ibm.com/security/mobile/maas360.html}},
 	urldate = {2016-10-12},
-	file = {IBM MaaS360 - Enterprise Mobility Management (EMM):/Users/bogwonch/Library/Application Support/Zotero/Profiles/3fc04s7l.default/zotero/storage/KMKXFW7G/maas360.html:text/html}
 }
 
 @inproceedings{humphrey_fine-grained_2007,
@@ -1734,7 +1729,6 @@ This has resulted in security implications for data leakage, data theft and regu
 	title = {Magic {Quadrant} for {Enterprise} {Mobility} {Management} {Suites}},
 	url = {https://www.gartner.com/doc/reprints?id=1-390IMNG&ct=160608&st=sb},
 	number = {G00279887},
-	urldate = {2016-11-23},
 	institution = {Gartrer},
 	author = {{Rob Smith} and {Bryan Taylor} and {Chris Silva} and {Manjanath Bhat} and {Terrence Cosgrove} and {John Girard}},
 	month = jun,
