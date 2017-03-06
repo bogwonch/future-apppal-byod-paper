@@ -2,7 +2,6 @@
 
 \usepackage{microtype}
 \usepackage{amsmath,amssymb,mathtools}
-\usepackage{hyperref}
 \usepackage{booktabs}
 \usepackage{graphicx}
 \usepackage{tablefootnote}
@@ -19,6 +18,13 @@
 \newcommand{\etal}{et~al.\@}
 
 \newcommand{\AppPAL}[0]{SP4BYOD}
+
+\usepackage{hyperref}
+\renewcommand{\sectionautorefname}{Section}
+\renewcommand{\subsectionautorefname}{Subsection}
+\renewcommand{\figureautorefname}{Figure}
+\renewcommand{\tableautorefname}{Table}
+\renewcommand{\itemautorefname}{Item}
 
 \usepackage{acronym}
 \acrodef{MDM}{Mobile Device Management}
@@ -77,7 +83,7 @@
 }
 
 \title{Capturing Policies for BYOD}
-\author{Joseph Hallett\thanks{Work supported by EPSRC App Guarden grant (EP/K032666/1); and the Alan Turing Institute.} and David Aspinall}
+\author{Joseph Hallett and David Aspinall\thanks{Work supported by EPSRC App Guarden grant (EP/K032666/1) and the Alan Turing Institute.}}
 \institute{School of Informatics, University of Edinburgh}
 \begin{document}
 \maketitle
@@ -86,7 +92,7 @@
   BYOD policies are informally specified using natural language.
   We show how the \AppPAL~language can help reduce ambiguity in 5 BYOD policies and link the specification of a BYOD policy to its implementation.
   Using a formalisation of the 5 policies written in \AppPAL, we make comparisons between them, and explore the delegation relationships within them.
-  We identify that whilst policy acknowledgement is a key part of all 5 policies, they are not managed by existing MDM tools.
+  We identify that whilst policy acknowledgement is a key part of all 5 policies, this is not managed by existing MDM tools.
 \end{abstract}
 \section{Introduction}
 \label{sec:intro}
@@ -95,56 +101,57 @@
 % 1 page
 
 Employees bring their own devices to work.
-In the past employees might have had a dedicated company device; 
-  but today around 70\% of companies have a BYOD scheme~\cite{schulze_byod_2016}. 
+In the past employees might have had a dedicated company device. 
+Today around 70\% of companies have a BYOD scheme~\cite{schulze_byod_2016}. 
 In some fields, 85\% of staff use their personal devices to look up work-sensitive information~\cite{patel_uk_2015}.
 Controlling employee's devices is a challenge for IT departments.
-Failure to manage devices can lead to employees accidentally leaking confidential information and the waste of company resources.
-Unfortunately the companies have limited control over the devices inside their networks if they do not own them.
+Failure to manage devices can lead to employees accidentally leaking confidential information.
+Unfortunately companies have limited control over the devices inside their networks if they do not own them.
 
-One solution to controlling devices is requiring users follow policies.
-They often take the form of a user agreement, written in natural language, which describes how devices should be used and configured.
+One solution to controlling devices is requiring users follow BYOD policies.
+A BYOD policy takes the form of a user agreement, written in natural language, which describes how devices should be used and configured.
 Various guides are available for companies wishing to implement a policy from governments, standards bodies, and organizations seeking to advise~\cite{nicholas_r._c._guerin_security_2008,souppaya_guidelines_????,cesg_byod_2015}.
 On top of user agreements, companies may also use \ac{MDM} software which can help enforce policies.
-\ac{MDM} software can configure a device's security settings, and add security APIs.
+\ac{MDM} software can configure a device's security settings, and add security APIs, helping enforce some aspects of the policies.
 But the use of \ac{MDM} software does not guarantee compliance.
-One survey from a leading MDM vendor found over 50\% of companies with their \ac{MDM} software still had devices that did not comply with their policies~\cite{mobileiron_security_labs_q4_2015}.
-Reasons for non-compliance included out-of-date policies and employees tampering with the \ac{MDM} software.
+One survey from a leading MDM vendor found over 50\% of companies using their \ac{MDM} software still had devices that did not comply with the policy~\cite{mobileiron_security_labs_q4_2015}.
+Reasons for non-compliance included out-of-date \ac{MDM} configurations that hadn't been updated, and employees tampering with the \ac{MDM} software.
 
 BYOD policies are becoming more intricate.
-Prior work has looked at developing \ac{MDM} software to enforce aspects of BYOD policies~\cite{costantino_towards_2013,martinelli_enhancing_2016,armando_enabling_2014}.
-Implementing a policy is only part of the problem, however.
+Prior work has looked at developing \ac{MDM} software to enforce some aspects~\cite{costantino_towards_2013,martinelli_enhancing_2016,armando_enabling_2014}.
+The \ac{MDM} encoding of a policy is only part of the problem, however.
 BYOD policies are specified informally using natural language, and they contain more than just access control decisions.
-These policies describe trust relationships inside the company between the IT departments, users, and HR each who may be delegated to make decisions and provide rules.
+They describe trust relationships inside the company between IT departments, users, and HR, who each may be delegated to provide rules and make decisions.
 Policies contain rules that require employees to acknowledge risks, and regulations.
 An antivirus or \ac{MDM} program may be used to \emph{implement} part of the policy.
 But it is the policy that \emph{specifies} which software to use and when. 
 There is no automatic way to check how the policy has been implemented and by what.
 
-Companies lack visibility as to how they implement their policies.
+Companies lack visibility as to how well they implement their policies.
 When considering what tools a company may use Morrow notes \emph{``particularly with the BYOD trend IT professionals do not know if anti-virus software is installed or if it's current''}~\cite{morrow_byod_2012}.
 Even when devices can implement policies correctly, it is hard to configure devices that are not owned by the company~\cite{tokuyoshi_security_2013}.
 Our work aims to address these problems directly: by using formal languages we can link the policy to the implementation.
 
-To describe the policies we came up with \AppPAL{}: 
-  a formal language for linking policies to the tools used to implement them and distributing decisions.
+To describe the BYOD policies we present \AppPAL{}: 
+  a formal language for linking policies to the tools used to implement them, and distributing decisions to relevant parties.
 Using a formalization of five BYOD policies written using \AppPAL~we identify different idioms and common delegation patterns present in BYOD policies.
 Our formalizations pick out the common concerns and trust relationships in these policies.
 We look at what decisions and trust relationships are used in BYOD policies.
 We identify BYOD idioms that capture frequently seen decisions in BYOD policies.
-These give a guide for where future work implementing BYOD tools should focus their efforts to cover more aspects of policies.
+These give a guide for where future work implementing \ac{MDM} tools should focus their efforts to cover more aspects of policies.
 
 \AppPAL~is not designed to replace existing static and dynamic analysis and enforcement tools.
-A company might use multiple tools, app stores, and even contractual agreements with employees to enforce their policies.
+A company might use multiple tools, app stores, or contractual agreements with employees to enforce their policies.
 We aim to help clarify the meaning of ambiguous natural language policy documents, and provide a rigorous means for following them.
 A company can use any \ac{MDM} tool, curated app store or user agreement to enforce their policy.
 \AppPAL~links the specification of the policy to its implementation, showing exactly how a policy is implemented and giving a rigorous means to enforce it.
 
-We show how \AppPAL~can be used to encode these policies and describe precisely the different trust relationships.
-\AppPAL~is an instantiation of the SecPAL authorization language~\cite{becker_secpal:_2010} for mobile device policies and implemented atop of AppPAL~\cite{hallett_apppal_2016}.
+We show how \AppPAL~can be used to encode policies and describe precisely the different trust relationships.
+\AppPAL~is an instantiation of the SecPAL authorization language~\cite{becker_secpal:_2010} for mobile device policies and implemented atop of AppPAL~\cite{hallett_apppal_2016},
+  which adds mobile device specific predicates to SecPAL, for example, capturing app permissions.
 SecPAL is also a useful tool for describing other policies surrounding mobile ecosystems~\cite{hallett_specifying_2016}.
-Our AppPAL implementation can be easily extended to support new types of policies.
-It also gives us access to tooling we have developed to check AppPAL policies for completeness and redundant statements.
+Our \AppPAL{}~implementation can be easily extended to support new types of policies.
+It also gives us access to tooling we have developed to check \AppPAL{}~policies for completeness and redundant statements.
 For this work additional tooling was developed to help visualise policies and describe their contents.
 This was helpful for making comparisons between policies and checking our formalisation for mistakes. 
 
@@ -368,7 +375,7 @@ The policy is designed as a sample agreement for a system trying to manage perso
       \midrule
       Number of rules                 & 33           & 15          & 56          & 20                                & 25          \\
       \AppPAL~statements              & 71           & 21          & 58          & 10                                & 39          \\
-      Policy coverage                 & 33 (100$\%$) & 14 (93$\%$) & 40 (71$\%$) & 10 (100\%)\tablefootnote{The Edindiburgh policy contains a large number of rules that whilst marked as such are infact just descriptions of the document.  All the policy rules that described restrictions or relationships were implemented in \AppPAL{}.} & 22 (88$\%$) \\
+      Policy coverage                 & 33 (100$\%$) & 14 (93$\%$) & 40 (71$\%$) & 10 (100\%)\tablefootnote{The Edinburgh policy contains a large number of rules that whilst marked as such are in fact just descriptions of the document.  All the policy rules that described restrictions or relationships were implemented in \AppPAL{}.} & 22 (88$\%$) \\
       \midrule
       Rules using Acknowledgement     & 2            & 10          & 11          & 1                                 & 6           \\
       Rules using Delegation          & 23           & 5           & 33          & 2                                 & 13          \\
